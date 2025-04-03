@@ -31,12 +31,12 @@ export default function Banner() {
                         <h1 className="text-[600%] font-normal leading-[100%] text-white mb-4">SMART Goal <br/>Setting</h1>
                         <p className="text-[32px] leading-[100%] font-normal text-white mb-11">Turn Goals into Done.</p>
                         <div className="flex flex-wrap gap-4">
-                            <Button className="bg-[#4BA135] text-black w-[190px] h-[84px] text-[36px]">Download</Button>
-                            <Button
-                                className="bg-white text-black w-[169px] h-[84px] text-[36px]"
+                            <button className="bg-[#4BA135] text-black w-[190px] h-[84px] text-[36px] rounded-[20px]">Download</button>
+                            <button
+                                className="bg-white text-black w-[169px] h-[84px] text-[36px] rounded-[20px]"
                             >
                                 Log in
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 </div>
