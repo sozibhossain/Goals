@@ -14,7 +14,7 @@ export default function Footer() {
             <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-12">
               <Link href="#" className="-m-1.5 p-1.5">
                 <span className="sr-only">Your Company</span>
-                <Image
+                <img
                   alt="Logo"
                   src="/assets/logo.png"
                   width={68}
