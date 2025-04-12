@@ -92,7 +92,7 @@ export default function Example() {
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
-                                src="/assets/logo.png"
+                                src="/assets/headerlogo.png"
                                 width={68}
                                 height={68}
                                 className="w-[68px] h-[68px]"
