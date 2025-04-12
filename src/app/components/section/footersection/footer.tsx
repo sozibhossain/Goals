@@ -3,7 +3,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import logo from "/public/assets/logo.png"
 
 export default function Footer() {
   return (
@@ -17,7 +16,7 @@ export default function Footer() {
                 <span className="sr-only">Your Company</span>
                 <Image
                   alt="Logo"
-                  src={logo}
+                  src="/assets/headerlogo.png"
                   width={68}
                   height={68}
                   className="w-[68px] h-[68px]"

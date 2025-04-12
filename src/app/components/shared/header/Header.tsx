@@ -13,8 +13,6 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 
-import logo from '/public/assets/logo.png'
-
 
 
 export default function Example() {
@@ -29,7 +27,7 @@ export default function Example() {
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
-                                src={logo}
+                                src="/assets/headerlogo.png"
                                 width={68}
                                 height={68}
                                 className="w-[68px] h-[68px]"
