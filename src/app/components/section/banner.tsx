@@ -20,7 +20,7 @@ export default function Banner() {
                 <div className="lg:flex items-center gap-[70px]">
                     <div className="hiden md:block lg:block">
                         <Image
-                            src="/assets/Banner-mobile.png"
+                            src="/assets/Bannermobile.png"
                             alt="Logo"
                             width={225}
                             height={550}
