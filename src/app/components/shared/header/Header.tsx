@@ -54,15 +54,32 @@ export default function Example() {
                     </button>
                 </div>
 
-                <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-[52px]">
-                    <div className='bg-black w-[72px] h-[44px] rounded-[20px] flex items-center justify-center'>
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-[12px]">
+                    <div className='bg-black px-[20px] py-[6px] rounded-lg flex items-center justify-center'>
                         <Link href="#" className="text-[20px] font-normal text-white mt-[-3px]">
                             Log in
                         </Link>
                     </div>
-                    <div className='bg-black w-[115px] h-[44px] rounded-[20px] flex items-center justify-center'>
-                        <Link href="#" className="text-[20px] font-normal text-white mt-[-3px]">
-                            Download
+                    <div>
+                        <Link href="#" className="w-[177px]">
+                            <Image
+                                src="/assets/appstore.webp"
+                                width={140}
+                                height={51}
+                                alt="Google Play"
+                                className="bg-black rounded-md w-[140px] h-[41px]"
+                            />
+                        </Link>
+                    </div>
+                    <div>
+                        <Link href="#" className="w-[199px]">
+                            <Image
+                                src="/assets/googleplay.webp"
+                                width={199}
+                                height={61}
+                                alt="App Store"
+                                className="bg-black rounded-md w-[140px] h-[41px]"
+                            />
                         </Link>
                     </div>
                 </div>
@@ -109,16 +126,32 @@ export default function Example() {
                             <div className="py-6">
                                 <Link
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                    className="-mx-3 block mb-4 rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                                 >
                                     Log in
                                 </Link>
-                                <Link
-                                    href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
-                                >
-                                    Download
-                                </Link>
+                                <div className='mb-4'>
+                                    <Link href="#" className="w-[177px]">
+                                        <Image
+                                            src="/assets/appstore.webp"
+                                            width={140}
+                                            height={51}
+                                            alt="Google Play"
+                                            className="bg-black rounded-md w-[140px] h-[41px]"
+                                        />
+                                    </Link>
+                                </div>
+                                <div>
+                                    <Link href="#" className="w-[199px]">
+                                        <Image
+                                            src="/assets/googleplay.webp"
+                                            width={199}
+                                            height={61}
+                                            alt="App Store"
+                                            className="bg-black rounded-md w-[140px] h-[41px]"
+                                        />
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

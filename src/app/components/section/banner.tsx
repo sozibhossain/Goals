@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 export default function Banner() {
     return (
@@ -15,7 +16,7 @@ export default function Banner() {
             </div>
 
             {/* {/ / Content Overlay / /} */}
-            <div className="flex relative z-10 flex-col justify-center h-full container">
+            <div className="flex relative flex-col justify-center h-full container">
                 <div className="lg:flex items-center gap-[70px]">
                     <div className="hiden md:block lg:block">
                         <Image
@@ -27,12 +28,31 @@ export default function Banner() {
                         />
                     </div>
                     <div className="">
-                        <h1 className="lg:text-[600%] md:text-[400%] text-[300%] font-normal leading-[120%] text-white mb-4 max-w-[528px]">SMART Goal Setting</h1>
-                        <p className="text-[32px] leading-[100%] font-normal text-white mb-11">Turn Goals into Done.</p>
+                        <h1 className="lg:text-[600%] md:text-[400%] text-[250%] font-normal leading-[120%] text-white mb-4 max-w-[528px]">SMART Goal Setting</h1>
+                        <p className="text-[22px] lg:text-[32px] leading-[100%] font-normal text-white mb-11">Turn Goals into Done.</p>
                         <div className="flex flex-wrap gap-4">
-                            <button className="bg-[#4BA135] text-black lg:w-[190px] w-[150px] lg:h-[84px] h-[70px] lg:text-[36px] text-[24px] rounded-[20px]">Download</button>
+                            <div className="flex gap-4">
+                                <Link href="#" className="">
+                                    <Image
+                                        src="/assets/appstore.webp"
+                                        width={177}
+                                        height={61}
+                                        alt="Google Play"
+                                        className="bg-black rounded-md w-[155px] h-[41px] lg:w-[177px] lg:h-[61px]"
+                                    />
+                                </Link>
+                                <Link href="#" className="">
+                                    <Image
+                                        src="/assets/googleplay.webp"
+                                        width={199}
+                                        height={61}
+                                        alt="App Store"
+                                        className="bg-black rounded-md w-[166px] h-[41px] lg:w-[199px] lg:h-[61px]"
+                                    />
+                                </Link>
+                            </div>
                             <button
-                                className="bg-white text-black lg:w-[169px] w-[150px] lg:h-[84px] h-[70px] lg:text-[36px] text-[24px] rounded-[20px]"
+                                className="bg-white text-black px-11 lg:px-8 text-[24px] rounded-lg"
                             >
                                 Log in
                             </button>

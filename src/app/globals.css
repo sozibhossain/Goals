@@ -85,3 +85,10 @@
     @apply bg-background text-foreground;
     }
 }
+
+@media screen and (max-width: 1280px) {
+  .mobileMockupArrow{
+    margin-top: -40px !important;
+    margin-left: 60px !important;
+  }
+}
