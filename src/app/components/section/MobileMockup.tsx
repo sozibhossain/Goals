@@ -43,7 +43,7 @@ export default function MobileMockup() {
                                         </div>
 
                                         {/* {/ Right phone - Dashboard /} */}
-                                        <div className="relative mt-[40px] lg:mt-[0px] md:h-[450px] h-[400px] md:w-[230px] w-[400px]">
+                                        <div className="relative mt-[40px] lg:mt-[0px] md:h-[450px] h-[400px] md:w-[230px] w-[300px]">
                                             <Image
                                                 src="/assets/mobilemockup/mock2.png"
                                                 alt="App dashboard interface"
