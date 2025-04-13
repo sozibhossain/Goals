@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Upload } from "lucide-react"
-import QuillEditor from "./_components/quill-editor"
+const QuillEditor = dynamic(() => import('./_components/quill-editor'), {
+  ssr: false,
+})
+
 import Image from "next/image"
+import dynamic from "next/dynamic"
 
 interface FormData {
   loginlink: string
@@ -28,7 +32,7 @@ interface FormErrors {
   whyUseGoals?: string
 }
 
-export default function FooterForm() {
+export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>({

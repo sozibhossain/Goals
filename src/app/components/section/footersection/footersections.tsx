@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ContactForm } from "./contact-form"
 
-export default function Footer() {
+export default function FooterSections() {
   return (
     <footer id="footer" className="bg-[#d9c7a7] relative rounded-[20px] mt-[-20px]">
       <div className="container pt-12 pb-4">
