@@ -1,77 +1,68 @@
-"use client";
-import { Sidebarcontents } from "@/data/admin-dashboard-data";
-import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { LogOut, Settings } from "lucide-react";
-import LogoutModal from "@/app/components/shared/logoutModal";
-import DashboardSidebarItem from "./dashboard-sidebar-item";
+"use client"
+
+import { Sidebarcontents } from "@/data/admin-dashboard-data"
+import React from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { LogOut, Menu } from "lucide-react"
+import LogoutModal from "@/app/components/shared/logoutModal"
+import DashboardSidebarItem from "./dashboard-sidebar-item"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
 const DashboardSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-//   const handleLogout = async () => {
-//     try {
-//       toast.success("You have successfully logged out!"); // Show toast first
-
-//       setTimeout(async () => {
-//         await signOut({ callbackUrl: "/" }); // Redirect after toast is shown
-//       }, 2000); // Wait for 2 seconds to let toast appear
-//     } catch (error) {
-//       console.error("Logout error:", error);
-//       toast.error("Failed to log out. Please try again."); // Show error toast
-//     }
-//   };
+  const [isOpen, setIsOpen] = React.useState(false)
 
   return (
-    <>
-      <div className="w-[300px] max-w-[354px] h-screen bg-white shadow-[4px_0px_10px_0px_rgba(0,0,0,0.25)] pl-7 sticky top-0 z-50 -mt-[86px] flex flex-col">
-        <div>
-          <div className="pt-[30px]">
-            <Link href="/">
-              <Image
-                src="/assets/headerlogo.png"
-                alt="logo"
-                width={64}
-                height={64}
-                className="w-[64px] h-[64px]"
-              />
+    <SidebarProvider>
+      <Sidebar className="border-r border-border">
+          <SidebarHeader className="hidden md:block lg:block pl-8 pt-4">
+            <Link href="/" className="flex items-center ">
+              <Image src="/assets/headerlogo.png" alt="logo" width={64} height={64} className="w-[64px] h-[64px]" />
             </Link>
-          </div>
-          <div className="mt-[70px]">
+          </SidebarHeader>
+        <SidebarContent className="px-4">
+          <div className="mt-4">
             {Sidebarcontents?.map((item) => (
               <DashboardSidebarItem key={item?.id} item={item} />
             ))}
           </div>
-        </div>
-        <div className="mt-auto pb-10">
-          <Button
-            variant="ghost"
-            className="w-full flex items-center justify-start gap-4 text-lg font-medium text-black leading-[120%] shadow-none border-none mb-4"
-          >
-            <Settings /> Setting
-          </Button>
+        </SidebarContent>
+        <SidebarFooter className="px-4 pb-6">
           <Button
             onClick={() => setIsOpen(true)}
             variant="ghost"
-            className="w-full flex items-center justify-start gap-4 text-lg font-medium text-black leading-[120%] shadow-none border-none "
+            className="w-full flex items-center justify-start gap-4 text-lg font-medium text-black leading-[120%] shadow-none border-none"
           >
             <LogOut /> Log out
           </Button>
-        </div>
+        </SidebarFooter>
+      </Sidebar>
 
-        {/* log out modal  */}
-        {isOpen && (
-          <LogoutModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            // onConfirm={handleLogout}
-          />
-        )}
+      {/* Mobile header with trigger */}
+      <div className="flex h-16 items-center border-b px-4 md:hidden">
+        <SidebarTrigger>
+          <Menu className="h-6 w-6" />
+        </SidebarTrigger>
       </div>
-    </>
-  );
-};
 
-export default DashboardSidebar;
+      {/* Logout modal */}
+      {isOpen && (
+        <LogoutModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        // onConfirm={handleLogout}
+        />
+      )}
+    </SidebarProvider>
+  )
+}
+
+export default DashboardSidebar

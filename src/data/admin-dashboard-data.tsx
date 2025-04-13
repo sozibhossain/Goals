@@ -21,15 +21,15 @@ export const Sidebarcontents: SidebarContentType[] = [
     },
     {
         id: 2,
-        name: "Hero section",
+        name: "Banner section",
         icon: <AiOutlineBars className="w-4 h-4"/>, 
-        href: "/admin-dashboard/hero-section",
+        href: "/dashboard/banner",
     },
     {
         id: 3,
         name: "Features",
         icon: <IoCartOutline className="w-4 h-4"/>, 
-        href: "/admin-dashboard/features",
+        href: "/dashboard/features",
     },
     {
         id: 4, 

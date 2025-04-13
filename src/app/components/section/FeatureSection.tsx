@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function FeatureSection() {
   return (
-    <section className="bg-[#cab694] relative mt-[-20px] rounded-t-[20px] lg:py-32 py-16">
+    <section id="featureSection" className="bg-[#cab694] relative mt-[-20px] rounded-t-[20px] lg:py-32 py-16">
       <div className="container">
         <div className="grid grid-cols-5 gap-10 lg:gap-0">
           {/* {/ {/ Left side - 4 Phone screens /} /} */}

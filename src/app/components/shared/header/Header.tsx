@@ -19,11 +19,11 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
-        <header className="bg-[#D9D9D9] rounded-t-[20px] h-[217px]">
-            <nav aria-label="Global" className="container flex items-center justify-between pt-[10px] pb-6">
+        <header className="bg-[#D9D9D9] rounded-[20px] sticky top-0 z-50">
+            <nav aria-label="Global" className="container flex items-center justify-between pt-[10px] pb-3">
                 <div className='flex items-center 2xl:gap-x-[420px] xl:gap-x-[220px] lg:gap-x-[110px]'>
                     <div className="flex lg:flex-1">
-                        <Link href="#" className="-m-1.5 p-1.5">
+                        <Link href="#featureSection" className="-m-1.5 p-1.5">
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
@@ -35,10 +35,10 @@ export default function Header() {
                         </Link>
                     </div>
                     <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-                        <Link href="#" className="text-[20px] font-normal leading-[100%] text-black">
+                        <Link href="#featureSection" className="text-[20px] font-normal leading-[100%] text-black">
                             Features
                         </Link>
-                        <Link href="#" className="text-[20px] font-normal leading-[100%] text-black">
+                        <Link href="#footer" className="text-[20px] font-normal leading-[100%] text-black">
                             Contact Us
                         </Link>
                     </PopoverGroup>

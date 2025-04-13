@@ -1,12 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { ContactForm } from "./contact-form"
 
 export default function Footer() {
   return (
-    <footer className="bg-[#d9c7a7] relative rounded-[20px] mt-[-20px]">
+    <footer id="footer" className="bg-[#d9c7a7] relative rounded-[20px] mt-[-20px]">
       <div className="container pt-12 pb-4">
         <div className="grid grid-cols-12 gap-4">
           {/* Logo and Download Section */}
@@ -113,21 +111,7 @@ export default function Footer() {
               <div className="col-span-12 lg:col-span-3">
                 <h3 className="flex justify-center mb-2 lg:mb-8 text-xl font-normal">Contact Goals App</h3>
                 <div className="bg-white p-6 rounded-md">
-                  <form className="space-y-4">
-                    <div>
-                      <Input type="text" placeholder="Name" className="bg-white border-gray-200" />
-                    </div>
-                    <div>
-                      <Input type="tel" placeholder="Number" className="bg-white border-gray-200" />
-                    </div>
-                    <div>
-                      <Input type="email" placeholder="Email" className="bg-white border-gray-200" />
-                    </div>
-                    <div>
-                      <Textarea placeholder="Message" className="bg-white border-gray-200" />
-                    </div>
-                    <Button className="w-full bg-black hover:bg-gray-800">Submit</Button>
-                  </form>
+                  <ContactForm />
                 </div>
               </div>
             </div>
