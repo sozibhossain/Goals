@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import { ColorPicker } from "../footer/_components/color-picker"
 
 interface FormData {
+  backgroundColor: string
   title1: string
   title2: string
   title3: string
@@ -31,6 +33,7 @@ interface FormErrors {
 
 export default function Page() {
   const [formData, setFormData] = useState<FormData>({
+    backgroundColor: "",
     title1: "",
     title2: "",
     title3: "",
@@ -39,6 +42,7 @@ export default function Page() {
     mobileImage3: null,
   })
 
+  const [selectedColor, setSelectedColor] = useState<string>("")
   const [errors, setErrors] = useState<FormErrors>({})
   const [backgroundImagePreview, setbackgroundImagePreview] = useState<string | null>(null)
   const [mobileImage2Preview, setMobileImage2Preview] = useState<string | null>(null)
@@ -55,6 +59,11 @@ export default function Page() {
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
+  }
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color)
+    setFormData((prev) => ({ ...prev, backgroundColor: color }))
   }
 
   const handleImageChange = (
@@ -97,6 +106,7 @@ export default function Page() {
     e.preventDefault()
     if (validateForm()) {
       console.log("Form data submitted:", {
+        backgroundColor: formData.backgroundColor,
         title1: formData.title1,
         title2: formData.title2,
         title3: formData.title3,
@@ -106,6 +116,7 @@ export default function Page() {
       })
 
       setFormData({
+        backgroundColor: "",
         title1: "",
         title2: "",
         title3: "",
@@ -114,6 +125,7 @@ export default function Page() {
         mobileImage3: null,
       })
 
+      setSelectedColor("")
       setbackgroundImagePreview(null)
       setMobileImage2Preview(null)
       setMobileImage3Preview(null)
@@ -127,10 +139,19 @@ export default function Page() {
       <h1 className="text-2xl font-bold mb-6">Mobile Mockup</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label>Background Color</Label>
+          <ColorPicker
+            selectedColor={selectedColor}
+            onColorChange={handleColorChange}
+            previousColor={formData.backgroundColor}
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* Mobile Image 1 */}
+          {/* Background Image */}
           <div className="space-y-2">
-            <Label htmlFor="backgroundImage">Background image</Label>
+            <Label htmlFor="backgroundImage">Left section Background image</Label>
             <input
               type="file"
               id="backgroundImage"
@@ -245,7 +266,7 @@ export default function Page() {
               id="title1"
               name="title1"
               type="text"
-              value={formData.title1 ?? ""}
+              value={formData.title1}
               onChange={handleInputChange}
               className={errors.title1 ? "border-red-500" : ""}
             />
@@ -258,7 +279,7 @@ export default function Page() {
               id="title2"
               name="title2"
               type="text"
-              value={formData.title2 ?? ""}
+              value={formData.title2}
               onChange={handleInputChange}
               className={errors.title2 ? "border-red-500" : ""}
             />
@@ -271,7 +292,7 @@ export default function Page() {
               id="title3"
               name="title3"
               type="text"
-              value={formData.title3 ?? ""}
+              value={formData.title3}
               onChange={handleInputChange}
               className={errors.title3 ? "border-red-500" : ""}
             />
