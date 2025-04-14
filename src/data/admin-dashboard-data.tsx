@@ -23,7 +23,17 @@ export const Sidebarcontents: SidebarContentType[] = [
         href: "/dashboard/features",
     },
     {
-        id: 4, 
+        id: 4,
+        name: "MobileMockup",
+        href: "/dashboard/mobile-mockup",
+    },
+    {
+        id: 5,
+        name: "Achieve-section",
+        href: "/dashboard/achieve-section",
+    },
+    {
+        id: 6, 
         name: "Footer",
         href: "/dashboard/footer",
     },

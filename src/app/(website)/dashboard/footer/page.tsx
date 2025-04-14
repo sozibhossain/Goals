@@ -1,25 +1,32 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import type React from "react"
-import { useState, useRef, type ChangeEvent } from "react"
+import { useState, useRef, useEffect, type ChangeEvent } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Upload } from "lucide-react"
-const QuillEditor = dynamic(() => import('./_components/quill-editor'), {
+import Image from "next/image"
+import { ColorPicker } from "./_components/color-picker"
+
+// Dynamically import QuillEditor for client-only rendering
+const QuillEditor = dynamic(() => import("./_components/quill-editor"), {
   ssr: false,
 })
 
-import Image from "next/image"
-import dynamic from "next/dynamic"
-
 interface FormData {
+  backgroundColor: string // New field for background color
   loginlink: string
   appstorelink: string
   googleplaylink: string
   whatWeDo: string
   whoWeAre: string
   whyUseGoals: string
+  image: {
+    name: string
+    data: string | null
+  }
 }
 
 interface FormErrors {
@@ -34,41 +41,56 @@ interface FormErrors {
 
 export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>({
+    backgroundColor: "", // Initial background color value
     loginlink: "",
     appstorelink: "",
     googleplaylink: "",
     whatWeDo: "",
     whoWeAre: "",
     whyUseGoals: "",
+    image: {
+      name: "",
+      data: null,
+    },
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedColor, setSelectedColor] = useState<string>("")
+  console.log("Selected color:", setSelectedColor)
+
+  useEffect(() => {
+    const logData = {
+      ...formData,
+      image: formData.image.name ? { name: formData.image.name } : null,
+    }
+    console.log("Form data updated:", logData)
+  }, [formData])
 
   const triggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
+    fileInputRef.current?.click()
   }
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       setErrors((prev) => ({ ...prev, image: "Please upload an image file" }))
       return
     }
 
-    // Clear any previous errors
     setErrors((prev) => ({ ...prev, image: undefined }))
 
-    // Create preview
     const reader = new FileReader()
     reader.onload = () => {
-      setImagePreview(reader.result as string)
+      setFormData((prev) => ({
+        ...prev,
+        image: {
+          name: file.name,
+          data: reader.result as string,
+        },
+      }))
     }
     reader.readAsDataURL(file)
   }
@@ -77,7 +99,6 @@ export default function Page() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-    // Clear error when user types
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
@@ -86,19 +107,23 @@ export default function Page() {
   const handleEditorChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
 
-    // Clear error when user edits
     if (errors[field as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
   }
 
+  const handleColorChange = (color: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      backgroundColor: color, // Set the selected color as background color
+    }))
+  }
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/ 
 
-    // URL validation regex
-    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
-
-    if (!imagePreview) {
+    if (!formData.image.data) {
       newErrors.image = "Please upload a logo image"
     }
 
@@ -134,31 +159,18 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     setIsSubmitting(true)
 
     try {
-      // Here you would typically send the data to your API
-      // const response = await fetch('/api/footer', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     ...formData,
-      //     logo: imagePreview
-      //   })
-      // });
-
-      // if (!response.ok) throw new Error('Failed to save footer data');
+      // ✅ Console log full form data including image and background color
+      console.log("Full form data:", formData)
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       alert("Footer information saved successfully!")
-      // You could redirect or clear the form here
     } catch (error) {
       console.error("Error submitting form:", error)
       alert("Failed to save footer information. Please try again.")
@@ -171,10 +183,20 @@ export default function Page() {
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Footer Settings</h1>
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left column */}
+        {/* Background Color Picker */}
+        <div className="space-y-2">
+          <Label htmlFor="backgroundColor">Background Color</Label>
+          <div className="mt-0">
+            <ColorPicker
+              selectedColor={selectedColor}
+              onColorChange={handleColorChange}
+              previousColor={formData.backgroundColor}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
-            {/* Image upload */}
             <div className="space-y-2">
               <Label htmlFor="image">Upload logo</Label>
               <input
@@ -189,14 +211,16 @@ export default function Page() {
                 onClick={triggerFileInput}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                {imagePreview ? (
+                {formData.image.data && formData.image.data.startsWith("data:image") ? (
                   <div className="space-y-2">
                     <Image
-                      src={imagePreview || "/placeholder.svg?height=160&width=320"}
+                      src={formData.image.data}
                       alt="Preview"
+                      width={300}
+                      height={100}
                       className="max-h-40 mx-auto object-contain"
                     />
-                    <p className="text-sm text-gray-500">Click to change image</p>
+                    <p className="text-sm text-gray-500">{formData.image.name} - Click to change image</p>
                   </div>
                 ) : (
                   <div className="py-4 flex flex-col items-center">
@@ -208,7 +232,7 @@ export default function Page() {
               {errors.image && <p className="text-sm text-red-500 mt-1">{errors.image}</p>}
             </div>
 
-            {/* Links */}
+            {/* Other form inputs for login, app store, etc. */}
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="loginlink">Log in</Label>
@@ -251,8 +275,8 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Right column - Rich text editors */}
           <div className="space-y-6">
+            {/* Quill editors for "What We Do", "Who We Are", and "Why Use Goals" */}
             <div className="space-y-2">
               <Label htmlFor="whatWeDo">What we do</Label>
               <QuillEditor

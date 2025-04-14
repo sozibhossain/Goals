@@ -14,61 +14,61 @@ interface FormData {
   appstorelink?: string
   googoleplaylink?: string
   loginlink?: string
-  mobileImage1: File | null
+  backgroundImage: File | null
   mobileImage2: File | null
   mobileImage3: File | null
   mobileImage4: File | null
-  allmobileImage: File | null
+  logoImage: File | null
 }
 
 interface FormErrors {
   title1?: string
   title2?: string
-  mobileImage1?: string
+  backgroundImage?: string
   mobileImage2?: string
   mobileImage3?: string
   mobileImage4?: string
-  allmobileImage?: string
+  logoImage?: string
 }
 
 // Only the keys that are image upload fields
 type ImageFieldKey =
-  | "mobileImage1"
+  | "backgroundImage"
   | "mobileImage2"
   | "mobileImage3"
   | "mobileImage4"
-  | "allmobileImage"
+  | "logoImage"
 
 export default function Page() {
   const [formData, setFormData] = useState<FormData>({
     title1: "",
     title2: "",
-    mobileImage1: null,
+    backgroundImage: null,
     mobileImage2: null,
     mobileImage3: null,
     mobileImage4: null,
-    allmobileImage: null,
+    logoImage: null,
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
-  const [mobileImage1Preview, setMobileImage1Preview] = useState<string | null>(null)
+  const [backgroundImagePreview, setbackgroundImagePreview] = useState<string | null>(null)
   const [mobileImage2Preview, setMobileImage2Preview] = useState<string | null>(null)
   const [mobileImage3Preview, setMobileImage3Preview] = useState<string | null>(null)
   const [mobileImage4Preview, setMobileImage4Preview] = useState<string | null>(null)
-  const [allmobileImagePreview, setAllmobileImagePreview] = useState<string | null>(null)
+  const [logoImagePreview, setlogoImagePreview] = useState<string | null>(null)
 
-  const mobileImage1Ref = useRef<HTMLInputElement>(null)
+  const backgroundImageRef = useRef<HTMLInputElement>(null)
   const mobileImage2Ref = useRef<HTMLInputElement>(null)
   const mobileImage3Ref = useRef<HTMLInputElement>(null)
   const mobileImage4Ref = useRef<HTMLInputElement>(null)
-  const allmobileImageRef = useRef<HTMLInputElement>(null)
+  const logoImageRef = useRef<HTMLInputElement>(null)
 
   const previewSetters: Record<ImageFieldKey, React.Dispatch<React.SetStateAction<string | null>>> = {
-    mobileImage1: setMobileImage1Preview,
+    backgroundImage: setbackgroundImagePreview,
     mobileImage2: setMobileImage2Preview,
     mobileImage3: setMobileImage3Preview,
     mobileImage4: setMobileImage4Preview,
-    allmobileImage: setAllmobileImagePreview,
+    logoImage: setlogoImagePreview,
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -105,11 +105,11 @@ export default function Page() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
     if (!formData.title1.trim()) newErrors.title1 = "Title 1 is required"
-    if (!formData.mobileImage1) newErrors.mobileImage1 = "Mobile image 1 is required"
+    if (!formData.backgroundImage) newErrors.backgroundImage = "Mobile image 1 is required"
     if (!formData.mobileImage2) newErrors.mobileImage2 = "Mobile image 2 is required"
     if (!formData.mobileImage3) newErrors.mobileImage3 = "Mobile image 3 is required"
     if (!formData.mobileImage4) newErrors.mobileImage4 = "Mobile image 4 is required"
-    if (!formData.allmobileImage) newErrors.allmobileImage = "All mobile image is required"
+    if (!formData.logoImage) newErrors.logoImage = "All mobile image is required"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -121,28 +121,28 @@ export default function Page() {
       console.log("Form data submitted:", {
         title1: formData.title1,
         title2: formData.title2,
-        mobileImage1: formData.mobileImage1?.name ?? "No image uploaded",
+        backgroundImage: formData.backgroundImage?.name ?? "No image uploaded",
         mobileImage2: formData.mobileImage2?.name ?? "No image uploaded",
         mobileImage3: formData.mobileImage3?.name ?? "No image uploaded",
         mobileImage4: formData.mobileImage4?.name ?? "No image uploaded",
-        allmobileImage: formData.allmobileImage?.name ?? "No image uploaded",
+        logoImage: formData.logoImage?.name ?? "No image uploaded",
       })
 
       setFormData({
         title1: "",
         title2: "",
-        mobileImage1: null,
+        backgroundImage: null,
         mobileImage2: null,
         mobileImage3: null,
         mobileImage4: null,
-        allmobileImage: null,
+        logoImage: null,
       })
 
-      setMobileImage1Preview(null)
+      setbackgroundImagePreview(null)
       setMobileImage2Preview(null)
       setMobileImage3Preview(null)
       setMobileImage4Preview(null)
-      setAllmobileImagePreview(null)
+      setlogoImagePreview(null)
 
       alert("Form submitted successfully! Check the console for form data.")
     } else {
@@ -197,15 +197,15 @@ export default function Page() {
 
   return (
     <div className="pb-10">
-      <h1 className="text-2xl font-bold mb-6">Features area</h1>
+      <h1 className="text-2xl font-bold mb-6">Achieve section area</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {renderImageInput("Upload mobile image 1", "mobileImage1", mobileImage1Ref, triggerInput(mobileImage1Ref), mobileImage1Preview, errors.mobileImage1)}
-            {renderImageInput("Upload mobile image 2", "mobileImage2", mobileImage2Ref, triggerInput(mobileImage2Ref), mobileImage2Preview, errors.mobileImage2)}
-            {renderImageInput("Upload mobile image 3", "mobileImage3", mobileImage3Ref, triggerInput(mobileImage3Ref), mobileImage3Preview, errors.mobileImage3)}
-            {renderImageInput("Upload mobile image 4", "mobileImage4", mobileImage4Ref, triggerInput(mobileImage4Ref), mobileImage4Preview, errors.mobileImage4)}
+            {renderImageInput("Upload Background image", "backgroundImage", backgroundImageRef, triggerInput(backgroundImageRef), backgroundImagePreview, errors.backgroundImage)}
+            {renderImageInput("Upload mobile image 1", "mobileImage2", mobileImage2Ref, triggerInput(mobileImage2Ref), mobileImage2Preview, errors.mobileImage2)}
+            {renderImageInput("Upload mobile image 2", "mobileImage3", mobileImage3Ref, triggerInput(mobileImage3Ref), mobileImage3Preview, errors.mobileImage3)}
+            {renderImageInput("Upload mobile image 3", "mobileImage4", mobileImage4Ref, triggerInput(mobileImage4Ref), mobileImage4Preview, errors.mobileImage4)}
           </div>
 
           <div className="space-y-2">
@@ -220,11 +220,6 @@ export default function Page() {
             />
             {errors.title1 && <p className="text-sm text-red-500 mt-1">{errors.title1}</p>}
           </div>
-        </div>
-
-        <div>
-          {renderImageInput("Upload all mobile image", "allmobileImage", allmobileImageRef, triggerInput(allmobileImageRef), allmobileImagePreview, errors.allmobileImage)}
-
           <div className="space-y-2 mt-4">
             <Label htmlFor="title2">Title2</Label>
             <Input
@@ -237,6 +232,12 @@ export default function Page() {
             />
             {errors.title2 && <p className="text-sm text-red-500 mt-1">{errors.title2}</p>}
           </div>
+        </div>
+
+        <div>
+          {renderImageInput("Upload Logo image", "logoImage", logoImageRef, triggerInput(logoImageRef), logoImagePreview, errors.logoImage)}
+
+
         </div>
 
         {Object.keys(errors).length > 0 && (
