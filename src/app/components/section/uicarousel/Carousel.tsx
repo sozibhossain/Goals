@@ -7,22 +7,23 @@ import "swiper/css/effect-cards"
 import "swiper/css/pagination"
 import "./carouselStyle.css"
 import Image from "next/image"
+import { AchiveData } from "@/types/home"
 
-export default function ClientCarousel() {
+export default function ClientCarousel({ achiveData }: { achiveData: AchiveData }) {
   const slides = [
     {
       id: 1,
-      image: "/assets/mobilemockup/mock2.png",
+      image: `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/Achieve/${achiveData?.mbl_img1}`,
       alt: "Mobile app screen 1",
     },
     {
       id: 2,
-      image: "/assets/mobilemockup/mock2.png",
+      image: `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/Achieve/${achiveData?.mbl_img2}`,
       alt: "Mobile app screen 2",
     },
     {
       id: 3,
-      image: "/assets/mobilemockup/mock2.png",
+      image: `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/Achieve/${achiveData?.mbl_img3}`,
       alt: "Mobile app screen 3",
     },
   ]
@@ -34,13 +35,11 @@ export default function ClientCarousel() {
         grabCursor={true}
         modules={[EffectCards, Pagination]}
         className="mySwiper"
-        pagination={{
-          clickable: true
-        }}
+        pagination={{ clickable: true }}
         cardsEffect={{
-            slideShadows: false,
-            perSlideOffset: 20, // Increase this for more spacing
-            perSlideRotate: 5, // Remove rotation for consistent appearance
+          slideShadows: false,
+          perSlideOffset: 20,
+          perSlideRotate: 5,
         }}
       >
         {slides.map((slide) => (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import {  useState } from 'react'
 import {
     Dialog,
     DialogPanel,
@@ -12,34 +12,50 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import Image from 'next/image'
+import { HeaderData } from '@/types/home'
+
+// type HeaderData = {
+//     id: number;
+//     img: string;
+//     item_name1: string;
+//     itemlink1: string;
+//     item_name2: string;
+//     itemlink2: string;
+//     login_link: string;
+//     app_store_link: string;
+//     google_play_link: string;
+//     created_at: string;
+//     updated_at: string;
+// };
 
 
-
-export default function Header() {
+export default function Header({ headerData }: {headerData: HeaderData}) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    
 
     return (
         <header className="bg-[#D9D9D9] rounded-[20px] sticky top-0 z-50">
             <nav aria-label="Global" className="container flex items-center justify-between pt-[10px] pb-3">
                 <div className='flex items-center 2xl:gap-x-[420px] xl:gap-x-[220px] lg:gap-x-[110px]'>
                     <div className="flex lg:flex-1">
-                        <Link href="#featureSection" className="-m-1.5 p-1.5">
+                        <Link href="/" className="-m-1.5 p-1.5">
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
-                                src="/assets/headerlogo.png"
+                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/headers/${headerData.img}`}
                                 width={68}
                                 height={68}
                                 className="w-[68px] h-[68px]"
+                                unoptimized
                             />
                         </Link>
                     </div>
                     <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-                        <Link href="#featureSection" className="text-[20px] font-normal leading-[100%] text-black">
-                            Features
+                        <Link href={headerData?.itemlink1 || "#"} className="text-[20px] font-normal leading-[100%] text-black">
+                            {headerData?.item_name1 || "Features"}
                         </Link>
-                        <Link href="#footer" className="text-[20px] font-normal leading-[100%] text-black">
-                            Contact Us
+                        <Link href={headerData?.itemlink2 || "#"} className="text-[20px] font-normal leading-[100%] text-black">
+                            {headerData?.item_name2 || "Contact Us"}
                         </Link>
                     </PopoverGroup>
                 </div>
@@ -56,12 +72,12 @@ export default function Header() {
 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-[12px]">
                     <div className='bg-black px-[20px] py-[6px] rounded-lg flex items-center justify-center'>
-                        <Link href="#" className="text-[20px] font-normal text-white mt-[-3px]">
+                        <Link href={headerData?.login_link || "#"} className="text-[20px] font-normal text-white mt-[-3px]">
                             Log in
                         </Link>
                     </div>
                     <div>
-                        <Link href="#" className="w-[177px]">
+                        <Link href={headerData?.app_store_link || "/assets/appstore.webp"} className="w-[177px]">
                             <Image
                                 src="/assets/appstore.webp"
                                 width={140}
@@ -72,7 +88,7 @@ export default function Header() {
                         </Link>
                     </div>
                     <div>
-                        <Link href="#" className="w-[199px]">
+                        <Link href={headerData?.google_play_link || "/assets/googleplay.webp"} className="w-[199px]">
                             <Image
                                 src="/assets/googleplay.webp"
                                 width={199}
@@ -111,27 +127,27 @@ export default function Header() {
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="space-y-2 py-6">
                                 <Link
-                                    href="#"
+                                    href={headerData?.itemlink1 || "#"}
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-gray-50"
                                 >
-                                    Features
+                                    {headerData?.item_name1 || "Features"}
                                 </Link>
                                 <Link
-                                    href="#"
+                                    href={headerData?.itemlink2 || "#"}
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-gray-50"
                                 >
-                                    Contact Us
+                                    {headerData?.item_name2 || "Contact Us"}
                                 </Link>
                             </div>
                             <div className="py-6">
                                 <Link
-                                    href="#"
+                                    href={headerData?.login_link || "#"}
                                     className="-mx-3 block mb-4 rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                                 >
                                     Log in
                                 </Link>
                                 <div className='mb-4'>
-                                    <Link href="#" className="w-[177px]">
+                                    <Link href={headerData?.app_store_link || "/assets/appstore.webp"} className="w-[177px]">
                                         <Image
                                             src="/assets/appstore.webp"
                                             width={140}
@@ -142,7 +158,7 @@ export default function Header() {
                                     </Link>
                                 </div>
                                 <div>
-                                    <Link href="#" className="w-[199px]">
+                                    <Link href={headerData?.google_play_link || "/assets/googleplay.webp"} className="w-[199px]">
                                         <Image
                                             src="/assets/googleplay.webp"
                                             width={199}
@@ -160,3 +176,5 @@ export default function Header() {
         </header>
     )
 }
+
+

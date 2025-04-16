@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent, type FormEvent } from "react"
+import { useState, useRef, type ChangeEvent, type FormEvent, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,9 +11,6 @@ import Image from "next/image"
 interface FormData {
   title1: string
   title2: string
-  appstorelink?: string
-  googoleplaylink?: string
-  loginlink?: string
   backgroundImage: File | null
   mobileImage2: File | null
   mobileImage3: File | null
@@ -31,13 +28,7 @@ interface FormErrors {
   logoImage?: string
 }
 
-// Only the keys that are image upload fields
-type ImageFieldKey =
-  | "backgroundImage"
-  | "mobileImage2"
-  | "mobileImage3"
-  | "mobileImage4"
-  | "logoImage"
+type ImageFieldKey = "backgroundImage" | "mobileImage2" | "mobileImage3" | "mobileImage4" | "logoImage"
 
 export default function Page() {
   const [formData, setFormData] = useState<FormData>({
@@ -63,6 +54,9 @@ export default function Page() {
   const mobileImage4Ref = useRef<HTMLInputElement>(null)
   const logoImageRef = useRef<HTMLInputElement>(null)
 
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+
   const previewSetters: Record<ImageFieldKey, React.Dispatch<React.SetStateAction<string | null>>> = {
     backgroundImage: setbackgroundImagePreview,
     mobileImage2: setMobileImage2Preview,
@@ -71,7 +65,7 @@ export default function Page() {
     logoImage: setlogoImagePreview,
   }
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name as keyof FormErrors]) {
@@ -105,28 +99,80 @@ export default function Page() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
     if (!formData.title1.trim()) newErrors.title1 = "Title 1 is required"
-    if (!formData.backgroundImage) newErrors.backgroundImage = "Mobile image 1 is required"
-    if (!formData.mobileImage2) newErrors.mobileImage2 = "Mobile image 2 is required"
-    if (!formData.mobileImage3) newErrors.mobileImage3 = "Mobile image 3 is required"
-    if (!formData.mobileImage4) newErrors.mobileImage4 = "Mobile image 4 is required"
-    if (!formData.logoImage) newErrors.logoImage = "All mobile image is required"
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0NzgzODk5LCJleHAiOjE3NDQ3ODc0OTksIm5iZiI6MTc0NDc4Mzg5OSwianRpIjoiamdjYmdOVElQY1JIaEFOaCIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.dcNhcXoB5_B6RWMPgZRYvwTqO15i7zl-Afi5RBi8tXc"
+
+  useEffect(() => {
+    const fetchAchieveMockupData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/achieve`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json()
+
+        if (data) {
+          setFormData({
+            title1: data.title1 || "",
+            title2: data.title2 || "",
+            backgroundImage: null,
+            mobileImage2: null,
+            mobileImage3: null,
+            mobileImage4: null,
+            logoImage: null,
+          })
+
+          setEditingId(data.id)
+
+          if (data.back_img) setbackgroundImagePreview(data.back_img)
+          if (data.mbl_img1) setMobileImage2Preview(data.mbl_img1)
+          if (data.mbl_img2) setMobileImage3Preview(data.mbl_img2)
+          if (data.mbl_img3) setMobileImage4Preview(data.mbl_img3)
+          if (data.logo_img) setlogoImagePreview(data.logo_img)
+        }
+      } catch (err) {
+        console.error("Error loading Achieve mockup data", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAchieveMockupData()
+  }, [])
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (validateForm()) {
-      console.log("Form data submitted:", {
-        title1: formData.title1,
-        title2: formData.title2,
-        backgroundImage: formData.backgroundImage?.name ?? "No image uploaded",
-        mobileImage2: formData.mobileImage2?.name ?? "No image uploaded",
-        mobileImage3: formData.mobileImage3?.name ?? "No image uploaded",
-        mobileImage4: formData.mobileImage4?.name ?? "No image uploaded",
-        logoImage: formData.logoImage?.name ?? "No image uploaded",
+
+    if (!validateForm()) return
+
+    const formPayload = new FormData()
+    formPayload.append("title1", formData.title1)
+    formPayload.append("title2", formData.title2)
+
+    if (formData.backgroundImage) formPayload.append("back_img", formData.backgroundImage)
+    if (formData.mobileImage2) formPayload.append("mbl_img1", formData.mobileImage2)
+    if (formData.mobileImage3) formPayload.append("mbl_img2", formData.mobileImage3)
+    if (formData.mobileImage4) formPayload.append("mbl_img3", formData.mobileImage4)
+    if (formData.logoImage) formPayload.append("logo_img", formData.logoImage)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/achieve`, {
+        method: editingId ? "POST" : "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formPayload,
       })
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+      const result = await response.json()
+      console.log("Form data submitted successfully:", result)
 
       setFormData({
         title1: "",
@@ -144,11 +190,13 @@ export default function Page() {
       setMobileImage4Preview(null)
       setlogoImagePreview(null)
 
-      alert("Form submitted successfully! Check the console for form data.")
-    } else {
-      console.log("Form has validation errors")
+      alert("Mobile mockup submitted successfully!")
+    } catch (error) {
+      console.error("Error submitting mobile mockup:", error)
+      alert("Failed to submit the form. Check the console for errors.")
     }
   }
+  
 
   const renderImageInput = (
     label: string,
@@ -195,6 +243,10 @@ export default function Page() {
     </div>
   )
 
+  if (loading) {
+    return <div>Loading...</div>;
+  } 
+  
   return (
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Achieve section area</h1>
@@ -236,8 +288,6 @@ export default function Page() {
 
         <div>
           {renderImageInput("Upload Logo image", "logoImage", logoImageRef, triggerInput(logoImageRef), logoImagePreview, errors.logoImage)}
-
-
         </div>
 
         {Object.keys(errors).length > 0 && (

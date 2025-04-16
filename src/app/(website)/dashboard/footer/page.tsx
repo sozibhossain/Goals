@@ -23,14 +23,11 @@ interface FormData {
   whatWeDo: string
   whoWeAre: string
   whyUseGoals: string
-  image: {
-    name: string
-    data: string | null
-  }
+  imageName: string // Storing only image name
 }
 
 interface FormErrors {
-  image?: string
+  imageName?: string
   loginlink?: string
   appstorelink?: string
   googleplaylink?: string
@@ -49,20 +46,18 @@ export default function Page() {
     whatWeDo: "",
     whoWeAre: "",
     whyUseGoals: "",
-    image: {
-      name: "",
-      data: null,
-    },
+    imageName: "", // Initial image name value
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedColor, setSelectedColor] = useState<string>("")
-  console.log("Selected color:", setSelectedColor)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const logData = {
       ...formData,
-      image: formData.image.name ? { name: formData.image.name } : null,
+      image: formData.imageName ? { name: formData.imageName } : null,
     }
     console.log("Form data updated:", logData)
   }, [formData])
@@ -76,23 +71,17 @@ export default function Page() {
     if (!file) return
 
     if (!file.type.startsWith("image/")) {
-      setErrors((prev) => ({ ...prev, image: "Please upload an image file" }))
+      setErrors((prev) => ({ ...prev, imageName: "Please upload an image file" }))
       return
     }
 
-    setErrors((prev) => ({ ...prev, image: undefined }))
+    setErrors((prev) => ({ ...prev, imageName: undefined }))
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      setFormData((prev) => ({
-        ...prev,
-        image: {
-          name: file.name,
-          data: reader.result as string,
-        },
-      }))
-    }
-    reader.readAsDataURL(file)
+    // Only save the image name, not the image data
+    setFormData((prev) => ({
+      ...prev,
+      imageName: file.name, // Save only the image name
+    }))
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -121,10 +110,10 @@ export default function Page() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/ 
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
 
-    if (!formData.image.data) {
-      newErrors.image = "Please upload a logo image"
+    if (!formData.imageName) {
+      newErrors.imageName = "Please upload a logo image"
     }
 
     if (!formData.loginlink) {
@@ -157,28 +146,126 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+  const token =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzk0MzQ4LCJleHAiOjE3NDQ3OTc5NDgsIm5iZiI6MTc0NDc5NDM0OCwianRpIjoiRWM2SThsWlFOVVFhNkJ5UiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.M1vg8xVWStFgJLT9uliBFsrqbnee5iBIijIEU_ABTfo";
 
-    setIsSubmitting(true)
+
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/footer`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (data) {
+          const footer = data;
+          console.log("footer", footer);
+
+          // Extract filename from logo URL if it exists
+          const logoImageName = footer.logo
+            ? footer.logo.split('/').pop()
+            : "";
+
+          setFormData({
+            backgroundColor: footer.color || "",
+            loginlink: footer.login_link || "",
+            appstorelink: footer.app_store_link || "",
+            googleplaylink: footer.google_play_link || "",
+            whatWeDo: footer.first_text || "",
+            whoWeAre: footer.second_text || "",
+            whyUseGoals: footer.third_text || "",
+            imageName: logoImageName,
+          });
+
+          setSelectedColor(footer.color || "");
+          setEditingId(footer.id);
+        }
+      } catch (err) {
+        console.error("Error loading footer data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      console.warn("Form has validation errors");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const formPayload = {
+      // Include the ID if we're editing
+      ...(editingId && { id: editingId }),
+      color: formData.backgroundColor,
+      login_link: formData.loginlink,
+      app_store_link: formData.appstorelink,
+      google_play_link: formData.googleplaylink,
+      first_text: formData.whatWeDo,
+      second_text: formData.whoWeAre,
+      third_text: formData.whyUseGoals,
+      logo: formData.imageName,
+    };
 
     try {
-      // ✅ Console log full form data including image and background color
-      console.log("Full form data:", formData)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/footer`, {
+        method: "POST", // Always POST
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formPayload),
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      alert("Footer information saved successfully!")
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      alert("Failed to save footer information. Please try again.")
+      const result = await response.json();
+      console.log("Form submitted successfully:", result);
+      alert("Footer information saved successfully!");
+
+      // Update editingId if this was a create operation
+      if (!editingId && result.id) {
+        setEditingId(result.id);
+      }
+
+    } catch (err) {
+      console.error("Form submission error:", err);
+      alert("Failed to submit Footer. Check console for details.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
+  };
+
+
+  // Reset the form
+  const resetForm = () => {
+    setFormData({
+      backgroundColor: "",
+      loginlink: "",
+      appstorelink: "",
+      googleplaylink: "",
+      whatWeDo: "",
+      whoWeAre: "",
+      whyUseGoals: "",
+      imageName: "", // Reset image name to empty string
+    })
+    setErrors({})
+    setSelectedColor("")
   }
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Footer Settings</h1>
@@ -197,6 +284,7 @@ export default function Page() {
 
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
+            {/* Image Upload Section */}
             <div className="space-y-2">
               <Label htmlFor="image">Upload logo</Label>
               <input
@@ -211,16 +299,21 @@ export default function Page() {
                 onClick={triggerFileInput}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                {formData.image.data && formData.image.data.startsWith("data:image") ? (
+                {formData.imageName ? (
                   <div className="space-y-2">
-                    <Image
-                      src={formData.image.data}
-                      alt="Preview"
-                      width={300}
-                      height={100}
-                      className="max-h-40 mx-auto object-contain"
-                    />
-                    <p className="text-sm text-gray-500">{formData.image.name} - Click to change image</p>
+                    <p className="text-sm text-gray-500">
+                      {formData.imageName} - Click to change image
+                    </p>
+                    {/* Display the preview image */}
+                    <div className="flex justify-center">
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${formData.imageName}`}
+                        alt="Uploaded Logo"
+                        width={150}
+                        height={100}
+                        className="mx-auto object-contain border rounded-lg"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="py-4 flex flex-col items-center">
@@ -229,8 +322,12 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              {errors.image && <p className="text-sm text-red-500 mt-1">{errors.image}</p>}
+              {errors.imageName && (
+                <p className="text-sm text-red-500 mt-1">{errors.imageName}</p>
+              )}
             </div>
+
+
 
             {/* Other form inputs for login, app store, etc. */}
             <div className="space-y-4">
@@ -309,7 +406,10 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end space-x-4">
+          <Button type="button" onClick={resetForm} className="min-w-[120px]">
+            Reset
+          </Button>
           <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
             {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
