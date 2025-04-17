@@ -58,6 +58,7 @@ export function LoginForm() {
     } catch (error) {
       if (error) {
         console.error("Login error:", error);
+        toast.error("Login failed");
       }
     } finally {
       setIsLoading(false); // Stop loading state
