@@ -47,8 +47,8 @@ function Home() {
 
 
     // console.log(homeData.header[0].itemlink1);
-    const featuresId = homeData.header[0].itemlink1.replace("#", "");
-    const contactId = homeData.header[0].itemlink2.replace("#", "");
+    const featuresId = homeData?.header?.[0]?.itemlink1?.replace("#", "") || "";
+    const contactId = homeData?.header?.[0]?.itemlink2?.replace("#", "") || "";
 
     return (
         <div>
