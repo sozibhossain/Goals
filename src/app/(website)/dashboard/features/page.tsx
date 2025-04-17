@@ -8,6 +8,7 @@ import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
 import { ColorPicker } from "../footer/_components/color-picker"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   backgroundColor: string
@@ -125,8 +126,8 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const token =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzk0MzQ4LCJleHAiOjE3NDQ3OTc5NDgsIm5iZiI6MTc0NDc5NDM0OCwianRpIjoiRWM2SThsWlFOVVFhNkJ5UiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.M1vg8xVWStFgJLT9uliBFsrqbnee5iBIijIEU_ABTfo";
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
     const fetchfeatureData = async () => {
@@ -172,44 +173,44 @@ export default function Page() {
     };
 
     fetchfeatureData();
-  }, []);
+  }, [token]);
 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+  
     if (!validateForm()) {
       console.warn("Form has validation errors");
       return;
     }
-
+  
     const formPayload = new FormData();
     formPayload.append("background_color", formData.backgroundColor);
-    formPayload.append("title", formData.title1);
-    formPayload.append("subtitle", formData.title2);
-
+    formPayload.append("title1", formData.title1); // ✅ Fixed key
+    formPayload.append("title2", formData.title2); // ✅ Fixed key
+  
     // Append images if available
     if (formData.mobileImage1) formPayload.append("mobile_img1", formData.mobileImage1);
     if (formData.mobileImage2) formPayload.append("mobile_img2", formData.mobileImage2);
     if (formData.mobileImage3) formPayload.append("mobile_img3", formData.mobileImage3);
     if (formData.mobileImage4) formPayload.append("mobile_img4", formData.mobileImage4);
     if (formData.allmobileImage) formPayload.append("all_mobile_img", formData.allmobileImage);
-
+  
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/feature`, {
-        method: editingId ? "POST" : "PUT",
+        method: editingId ? "POST" : "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: formPayload,
       });
-
+  
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+  
       const result = await response.json();
       console.log("Form submitted successfully:", result);
       alert("Mobile Mockup data saved successfully!");
-
+  
       // Reset form and previews
       setFormData({
         backgroundColor: "",
@@ -221,19 +222,21 @@ export default function Page() {
         mobileImage4: null,
         allmobileImage: null,
       });
-
+  
       setSelectedColor("");
       setMobileImage1Preview(null);
       setMobileImage2Preview(null);
       setMobileImage3Preview(null);
       setMobileImage4Preview(null);
       setAllmobileImagePreview(null);
-
+  
     } catch (err) {
       console.error("Form submission error:", err);
       alert("Failed to submit Mobile Mockup. Check console for details.");
     }
   };
+  
+  
 
 
   const renderImageInput = (

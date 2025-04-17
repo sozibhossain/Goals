@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   itemname: string
@@ -47,7 +48,7 @@ export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  
+
 
 
 
@@ -134,11 +135,11 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
     const fetchHeaderData = async () => {
-      const token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzc0MDUyLCJleHAiOjE3NDQ3Nzc2NTIsIm5iZiI6MTc0NDc3NDA1MiwianRpIjoiQVRUWWVhamtkODVhcnJQNiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.lXbUWtwz0zOp_SFA7ISobQtIrwRlOsdwvJMSfL-Zens";
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/header`, {
           headers: {
@@ -146,11 +147,11 @@ export default function Page() {
           },
         });
         const data = await response.json();
-    
+
 
         if (data) {
           const header = data;
-          console.log("dsadasd",header)
+          console.log("dsadasd", header)
           setFormData({
             itemname: header.item_name1 || "",
             itemlink: header.itemlink1 || "",
@@ -177,17 +178,15 @@ export default function Page() {
     };
 
     fetchHeaderData();
-  }, []);
- 
+  }, [token]);
 
- 
+
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      const token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzc0MDUyLCJleHAiOjE3NDQ3Nzc2NTIsIm5iZiI6MTc0NDc3NDA1MiwianRpIjoiQVRUWWVhamtkODVhcnJQNiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.lXbUWtwz0zOp_SFA7ISobQtIrwRlOsdwvJMSfL-Zens";
 
       const formPayload = new FormData();
       formPayload.append("item_name1", formData.itemname);

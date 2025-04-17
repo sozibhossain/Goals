@@ -25,7 +25,6 @@ const formSchema = z.object({
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters" }),
-  rememberMe: z.boolean().default(false),
 });
 
 export function LoginForm() {
@@ -75,7 +74,7 @@ export function LoginForm() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> 
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
             name="email"
@@ -103,15 +102,15 @@ export function LoginForm() {
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <div className="relative">
-                  <Input
-                    placeholder="Enter your password"
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                    className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-secondary-100 focus-visible:outline-none"
-                  />
-                  <button className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" type="button" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
-                  </button>
+                    <Input
+                      placeholder="Enter your password"
+                      type={showPassword ? "text" : "password"}
+                      {...field}
+                      className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-secondary-100 focus-visible:outline-none"
+                    />
+                    <button className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" type="button" onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                    </button>
                   </div>
                 </FormControl>
                 <FormMessage />

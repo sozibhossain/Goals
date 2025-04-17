@@ -90,7 +90,7 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
 
         {/* Copyright */}
         <div className="mt-[80px] text-sm text-center lg:text-start">
-          <p>2025 © Goals by Splurij</p>
+        <p>{`${new Date().getFullYear()} © Goals by Splurij`}</p>
         </div>
       </div>
     </footer>

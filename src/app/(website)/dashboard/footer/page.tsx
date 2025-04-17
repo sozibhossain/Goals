@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Upload } from "lucide-react"
 import Image from "next/image"
 import { ColorPicker } from "./_components/color-picker"
+import { useSession } from "next-auth/react"
 
 // Dynamically import QuillEditor for client-only rendering
 const QuillEditor = dynamic(() => import("./_components/quill-editor"), {
@@ -16,18 +17,19 @@ const QuillEditor = dynamic(() => import("./_components/quill-editor"), {
 })
 
 interface FormData {
-  backgroundColor: string // New field for background color
+  backgroundColor: string
   loginlink: string
   appstorelink: string
   googleplaylink: string
   whatWeDo: string
   whoWeAre: string
   whyUseGoals: string
-  imageName: string // Storing only image name
+  imageFile: File | null
+  existingImageName: string
 }
 
 interface FormErrors {
-  imageName?: string
+  imageFile?: string
   loginlink?: string
   appstorelink?: string
   googleplaylink?: string
@@ -39,28 +41,71 @@ interface FormErrors {
 export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState<FormData>({
-    backgroundColor: "", // Initial background color value
+    backgroundColor: "",
     loginlink: "",
     appstorelink: "",
     googleplaylink: "",
     whatWeDo: "",
     whoWeAre: "",
     whyUseGoals: "",
-    imageName: "", // Initial image name value
+    imageFile: null,
+    existingImageName: "",
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedColor, setSelectedColor] = useState<string>("")
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const session = useSession()
+  const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
-    const logData = {
-      ...formData,
-      image: formData.imageName ? { name: formData.imageName } : null,
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/footer`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) throw new Error("Failed to fetch footer data")
+
+        const data = await response.json()
+
+        if (data) {
+          const footer = data
+          const logoImageName = footer.logo ? footer.logo.split('/').pop() : ""
+
+          setFormData({
+            backgroundColor: footer.color || "",
+            loginlink: footer.login_link || "",
+            appstorelink: footer.app_store_link || "",
+            googleplaylink: footer.google_play_link || "",
+            whatWeDo: footer.first_text || "",
+            whoWeAre: footer.second_text || "",
+            whyUseGoals: footer.third_text || "",
+            imageFile: null,
+            existingImageName: logoImageName,
+          })
+
+          setSelectedColor(footer.color || "")
+          setEditingId(footer.id)
+
+          if (logoImageName) {
+            setImagePreview(`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads//settings/${logoImageName}`)
+          }
+        }
+      } catch (err) {
+        console.error("Error loading footer data", err)
+      } finally {
+        setLoading(false)
+      }
     }
-    console.log("Form data updated:", logData)
-  }, [formData])
+
+    fetchFooterData()
+  }, [token])
 
   const triggerFileInput = () => {
     fileInputRef.current?.click()
@@ -71,16 +116,20 @@ export default function Page() {
     if (!file) return
 
     if (!file.type.startsWith("image/")) {
-      setErrors((prev) => ({ ...prev, imageName: "Please upload an image file" }))
+      setErrors((prev) => ({ ...prev, imageFile: "Please upload an image file" }))
       return
     }
 
-    setErrors((prev) => ({ ...prev, imageName: undefined }))
+    setErrors((prev) => ({ ...prev, imageFile: undefined }))
 
-    // Only save the image name, not the image data
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file)
+    setImagePreview(previewUrl)
+
     setFormData((prev) => ({
       ...prev,
-      imageName: file.name, // Save only the image name
+      imageFile: file,
+      existingImageName: "",
     }))
   }
 
@@ -104,7 +153,7 @@ export default function Page() {
   const handleColorChange = (color: string) => {
     setFormData((prev) => ({
       ...prev,
-      backgroundColor: color, // Set the selected color as background color
+      backgroundColor: color,
     }))
   }
 
@@ -112,8 +161,8 @@ export default function Page() {
     const newErrors: FormErrors = {}
     const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
 
-    if (!formData.imageName) {
-      newErrors.imageName = "Please upload a logo image"
+    if (!formData.imageFile && !formData.existingImageName) {
+      newErrors.imageFile = "Please upload a logo image"
     }
 
     if (!formData.loginlink) {
@@ -146,107 +195,67 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const token =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzk0MzQ4LCJleHAiOjE3NDQ3OTc5NDgsIm5iZiI6MTc0NDc5NDM0OCwianRpIjoiRWM2SThsWlFOVVFhNkJ5UiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.M1vg8xVWStFgJLT9uliBFsrqbnee5iBIijIEU_ABTfo";
-
-
-  useEffect(() => {
-    const fetchFooterData = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/footer`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-
-        if (data) {
-          const footer = data;
-          console.log("footer", footer);
-
-          // Extract filename from logo URL if it exists
-          const logoImageName = footer.logo
-            ? footer.logo.split('/').pop()
-            : "";
-
-          setFormData({
-            backgroundColor: footer.color || "",
-            loginlink: footer.login_link || "",
-            appstorelink: footer.app_store_link || "",
-            googleplaylink: footer.google_play_link || "",
-            whatWeDo: footer.first_text || "",
-            whoWeAre: footer.second_text || "",
-            whyUseGoals: footer.third_text || "",
-            imageName: logoImageName,
-          });
-
-          setSelectedColor(footer.color || "");
-          setEditingId(footer.id);
-        }
-      } catch (err) {
-        console.error("Error loading footer data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFooterData();
-  }, []);
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!validateForm()) {
-      console.warn("Form has validation errors");
-      return;
+      console.warn("Form has validation errors")
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
-    const formPayload = {
-      // Include the ID if we're editing
-      ...(editingId && { id: editingId }),
-      color: formData.backgroundColor,
-      login_link: formData.loginlink,
-      app_store_link: formData.appstorelink,
-      google_play_link: formData.googleplaylink,
-      first_text: formData.whatWeDo,
-      second_text: formData.whoWeAre,
-      third_text: formData.whyUseGoals,
-      logo: formData.imageName,
-    };
+    const formPayload = new FormData()
+    
+    // Append all fields to FormData
+    formPayload.append("color", formData.backgroundColor)
+    formPayload.append("login_link", formData.loginlink)
+    formPayload.append("app_store_link", formData.appstorelink)
+    formPayload.append("google_play_link", formData.googleplaylink)
+    formPayload.append("first_text", formData.whatWeDo)
+    formPayload.append("second_text", formData.whoWeAre)
+    formPayload.append("third_text", formData.whyUseGoals)
+    
+    // Only append the image if a new one was uploaded
+    if (formData.imageFile) {
+      formPayload.append("logo", formData.imageFile)
+    } else if (formData.existingImageName) {
+      formPayload.append("existing_logo", formData.existingImageName)
+    }
+
+    // Include the ID if we're editing
+    if (editingId) {
+      formPayload.append("id", editingId.toString())
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/footer`, {
-        method: "POST", // Always POST
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formPayload),
-      });
+        body: formPayload,
+      })
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
 
-      const result = await response.json();
-      console.log("Form submitted successfully:", result);
-      alert("Footer information saved successfully!");
+      const result = await response.json()
+      console.log("Form submitted successfully:", result)
+      alert("Footer information saved successfully!")
 
       // Update editingId if this was a create operation
       if (!editingId && result.id) {
-        setEditingId(result.id);
+        setEditingId(result.id)
       }
 
     } catch (err) {
-      console.error("Form submission error:", err);
-      alert("Failed to submit Footer. Check console for details.");
+      console.error("Form submission error:", err)
+      alert("Failed to submit Footer. Check console for details.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-
-  // Reset the form
   const resetForm = () => {
     setFormData({
       backgroundColor: "",
@@ -256,16 +265,18 @@ export default function Page() {
       whatWeDo: "",
       whoWeAre: "",
       whyUseGoals: "",
-      imageName: "", // Reset image name to empty string
+      imageFile: null,
+      existingImageName: "",
     })
     setErrors({})
     setSelectedColor("")
+    setImagePreview(null)
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
-  
+
   return (
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Footer Settings</h1>
@@ -299,15 +310,14 @@ export default function Page() {
                 onClick={triggerFileInput}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                {formData.imageName ? (
+                {imagePreview || formData.existingImageName ? (
                   <div className="space-y-2">
                     <p className="text-sm text-gray-500">
-                      {formData.imageName} - Click to change image
+                      {formData.imageFile?.name || formData.existingImageName} - Click to change image
                     </p>
-                    {/* Display the preview image */}
                     <div className="flex justify-center">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${formData.imageName}`}
+                        src={imagePreview || `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${formData.existingImageName}`}
                         alt="Uploaded Logo"
                         width={150}
                         height={100}
@@ -322,12 +332,10 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              {errors.imageName && (
-                <p className="text-sm text-red-500 mt-1">{errors.imageName}</p>
+              {errors.imageFile && (
+                <p className="text-sm text-red-500 mt-1">{errors.imageFile}</p>
               )}
             </div>
-
-
 
             {/* Other form inputs for login, app store, etc. */}
             <div className="space-y-4">

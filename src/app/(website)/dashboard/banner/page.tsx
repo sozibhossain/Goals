@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   title: string
@@ -138,30 +139,23 @@ export default function Page() {
       newErrors.loginlink = "Login link must be a valid URL (start with http:// or https://)"
     }
 
-    // // Background image validation
-    // if (!formData.backgroundImage) {
-    //   newErrors.backgroundImage = "Background image is required"
-    // }
-
-    // // Mobile image validation
-    // if (!formData.mobileImage) {
-    //   newErrors.mobileImage = "Mobile image is required"
-    // }
+    
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
     const fetchBannerData = async () => {
-      const token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzc0MDUyLCJleHAiOjE3NDQ3Nzc2NTIsIm5iZiI6MTc0NDc3NDA1MiwianRpIjoiQVRUWWVhamtkODVhcnJQNiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.lXbUWtwz0zOp_SFA7ISobQtIrwRlOsdwvJMSfL-Zens";
   
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/banner`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          
         });
   
         const data = await response.json();
@@ -197,68 +191,67 @@ export default function Page() {
     };
   
     fetchBannerData();
-  }, []);
+  }, [token]);
   
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
   
-    if (validateForm()) {
-      const token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0Nzc0MDUyLCJleHAiOjE3NDQ3Nzc2NTIsIm5iZiI6MTc0NDc3NDA1MiwianRpIjoiQVRUWWVhamtkODVhcnJQNiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.lXbUWtwz0zOp_SFA7ISobQtIrwRlOsdwvJMSfL-Zens";
-  
-      const formPayload = new FormData();
-      formPayload.append("title", formData.title);
-      formPayload.append("subtitle", formData.subtitle);
-      formPayload.append("app_store_link", formData.appstorelink);
-      formPayload.append("google_play_link", formData.googoleplaylink);
-      formPayload.append("login_link", formData.loginlink);
-  
-      if (formData.backgroundImage) {
-        formPayload.append("img1", formData.backgroundImage);
-      }
-  
-      if (formData.mobileImage) {
-        formPayload.append("img2", formData.mobileImage);
-      }
-  
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/banner`, {
-          method: editingId ? "POST" : "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formPayload,
-        });
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-  
-        const result = await response.json();
-        console.log("Banner form submitted successfully:", result);
-  
-        // Reset form
-        setFormData({
-          title: "",
-          subtitle: "",
-          appstorelink: "",
-          googoleplaylink: "",
-          loginlink: "",
-          backgroundImage: null,
-          mobileImage: null,
-        });
-        setBackgroundImagePreview(null);
-        setMobileImagePreview(null);
-  
-        alert("Form submitted successfully! Check the console for response data.");
-      } catch (error) {
-        console.error("Error submitting banner form:", error);
-        alert("Failed to submit the banner. See console for details.");
-      }
-    } else {
+    if (!validateForm()) {
       console.log("Form has validation errors");
+      return;
+    }
+  
+    const formPayload = new FormData();
+    formPayload.append("title", formData.title);
+    formPayload.append("subtitle", formData.subtitle);
+    formPayload.append("app_store_link", formData.appstorelink);
+    formPayload.append("google_play_link", formData.googoleplaylink);
+    formPayload.append("login_link", formData.loginlink);
+  
+    if (formData.backgroundImage) {
+      formPayload.append("img1", formData.backgroundImage);
+    }
+  
+    if (formData.mobileImage) {
+      formPayload.append("img2", formData.mobileImage);
+    }
+  
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/banner`, {
+        method: editingId ? "POST" : "POST", // 🔒 Force POST only
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formPayload,
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log("Banner form submitted successfully:", result);
+  
+      // Reset form
+      setFormData({
+        title: "",
+        subtitle: "",
+        appstorelink: "",
+        googoleplaylink: "",
+        loginlink: "",
+        backgroundImage: null,
+        mobileImage: null,
+      });
+      setBackgroundImagePreview(null);
+      setMobileImagePreview(null);
+  
+      alert("Form submitted successfully! Check the console for response data.");
+    } catch (error) {
+      console.error("Error submitting banner form:", error);
+      alert("Failed to submit the banner. See console for details.");
     }
   };
+  
   
   if (loading) {
     return <div>Loading...</div>;

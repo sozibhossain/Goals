@@ -1,4 +1,4 @@
-import {  NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 export function middleware() {
   // const token = req.cookies.get("next-auth.session-token");
   // if (!token) {
@@ -8,5 +8,5 @@ export function middleware() {
 }
 
 // export const config = {
-//   matcher: "/admin-dashboard",
+//   matcher: "/dashboard",
 // };

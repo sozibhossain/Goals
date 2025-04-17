@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   title1: string
@@ -103,7 +104,8 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0NzgzODk5LCJleHAiOjE3NDQ3ODc0OTksIm5iZiI6MTc0NDc4Mzg5OSwianRpIjoiamdjYmdOVElQY1JIaEFOaCIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.dcNhcXoB5_B6RWMPgZRYvwTqO15i7zl-Afi5RBi8tXc"
+  const session = useSession();
+    const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
     const fetchAchieveMockupData = async () => {
@@ -143,7 +145,7 @@ export default function Page() {
     }
 
     fetchAchieveMockupData()
-  }, [])
+  }, [token])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -304,3 +306,4 @@ export default function Page() {
     </div>
   )
 }
+

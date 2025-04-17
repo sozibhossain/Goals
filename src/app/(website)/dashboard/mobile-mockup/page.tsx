@@ -8,6 +8,7 @@ import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
 import { ColorPicker } from "../footer/_components/color-picker"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   backgroundColor: string
@@ -96,18 +97,15 @@ export default function Page() {
     if (!formData.title1.trim()) newErrors.title1 = "Title 1 is required"
     if (!formData.title2.trim()) newErrors.title2 = "Title 2 is required"
     if (!formData.title3.trim()) newErrors.title3 = "Title 3 is required"
-    if (!formData.backgroundImage) newErrors.backgroundImage = "Mobile image 1 is required"
-    if (!formData.mobileImage2) newErrors.mobileImage2 = "Mobile image 2 is required"
-    if (!formData.mobileImage3) newErrors.mobileImage3 = "Mobile image 3 is required"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-  const token =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ0NzgzODk5LCJleHAiOjE3NDQ3ODc0OTksIm5iZiI6MTc0NDc4Mzg5OSwianRpIjoiamdjYmdOVElQY1JIaEFOaCIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.dcNhcXoB5_B6RWMPgZRYvwTqO15i7zl-Afi5RBi8tXc";
 
 
-  
+
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
     const fetchMobileMockupData = async () => {
@@ -117,13 +115,13 @@ export default function Page() {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         const data = await response.json();
-  
+
         if (data) {
           const mobilemockup = data;
           console.log("mobilemockup", mobilemockup);
-  
+
           setFormData({
             backgroundColor: mobilemockup.color || "",
             title1: mobilemockup.title1 || "",
@@ -133,10 +131,10 @@ export default function Page() {
             mobileImage2: null,
             mobileImage3: null,
           });
-  
+
           setEditingId(mobilemockup.id);
           setSelectedColor(mobilemockup.color || "");
-  
+
           if (mobilemockup.back_img) {
             setbackgroundImagePreview(mobilemockup.back_img);
           }
@@ -153,11 +151,11 @@ export default function Page() {
         setLoading(false);
       }
     };
-  
+
     fetchMobileMockupData();
-  }, []);
-  
-  
+  }, [token]);
+
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -181,18 +179,13 @@ export default function Page() {
     if (formData.mobileImage3) formPayload.append("img3", formData.mobileImage3);
   
     try {
-      // Construct the appropriate API URL based on whether we're editing or creating
-      const url = editingId
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup/${editingId}`
-        : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup`;
-  
-      // Send the request to the backend
-      const response = await fetch(url, {
-        method: editingId ? "PUT" : "POST",  // Use PUT if editing an existing record
+      // Send the request to the backend (only POST request)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup`, {
+        method: editingId ? "POST" : "POST", // Always POST
         headers: {
-          Authorization: `Bearer ${token}`,  // Authorization header
+          Authorization: `Bearer ${token}`,
         },
-        body: formPayload,  // Attach form data as the body
+        body: formPayload,
       });
   
       // Check for a successful response
@@ -214,7 +207,6 @@ export default function Page() {
       });
   
       // Clear the preview images and other states
-      setEditingId(null);
       setbackgroundImagePreview(null);
       setMobileImage2Preview(null);
       setMobileImage3Preview(null);
@@ -227,10 +219,13 @@ export default function Page() {
   };
   
   
+  
+
+
   if (loading) {
     return <div>Loading...</div>;
   }
-  
+
   return (
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Mobile Mockup</h1>
