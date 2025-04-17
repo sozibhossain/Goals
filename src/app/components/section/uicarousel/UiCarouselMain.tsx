@@ -4,7 +4,6 @@ import ClientCarousel from './Carousel'
 import { AchiveData } from '@/types/home'
 
 export default function UiCarouselMain({ achiveData }: { achiveData: AchiveData }) {
-    console.log(achiveData);
     return (
         <section
             className="py-16 lg:py-28 relative overflow-hidden rounded-t-[20px] mt-[-20px]"
