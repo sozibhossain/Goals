@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent, type FormEvent } from "react"
+import { useState, useRef, type ChangeEvent, type FormEvent, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   itemname: string
@@ -45,6 +46,11 @@ export default function Page() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+
+
+
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -129,40 +135,114 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
+
+  useEffect(() => {
+    const fetchHeaderData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/header`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+
+        if (data) {
+          const header = data;
+          console.log("dsadasd", header)
+          setFormData({
+            itemname: header.item_name1 || "",
+            itemlink: header.itemlink1 || "",
+            itemname2: header.item_name2 || "",
+            itemlink2: header.itemlink2 || "",
+            loginlink: header.login_link || "",
+            appstorelink: header.app_store_link || "",
+            googoleplaylink: header.google_play_link || "",
+            image: null,
+          });
+
+          setEditingId(header.id);
+          if (header.img) {
+            setImagePreview(header.img);
+          }
+        }
+
+
+      } catch (error) {
+        console.error("Failed to fetch header data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeaderData();
+  }, [token]);
+
+
+
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
     if (validateForm()) {
-      // Log all form data to console
-      console.log("Form data submitted:", {
-        itemname: formData.itemname,
-        itemlink: formData.itemlink,
-        itemname2: formData.itemname2,
-        itemlink2: formData.itemlink2,
-        loginlink: formData.loginlink,
-        appstorelink: formData.appstorelink,
-        googoleplaylink: formData.googoleplaylink,
-        image: formData.image ? formData.image.name : "No image uploaded",
-      })
 
-      // Reset form after successful submission
-      setFormData({
-        itemname: "",
-        itemlink: "",
-        itemname2: "",
-        itemlink2: "",
-        loginlink: "",
-        appstorelink: "",
-        googoleplaylink: "",
-        image: null,
-      })
-      setImagePreview(null)
+      const formPayload = new FormData();
+      formPayload.append("item_name1", formData.itemname);
+      formPayload.append("itemlink1", formData.itemlink);
+      formPayload.append("item_name2", formData.itemname2);
+      formPayload.append("itemlink2", formData.itemlink2);
+      formPayload.append("login_link", formData.loginlink);
+      formPayload.append("app_store_link", formData.appstorelink);
+      formPayload.append("google_play_link", formData.googoleplaylink);
+      if (formData.image) {
+        formPayload.append("image", formData.image);
+      }
 
-      alert("Form submitted successfully! Check the console for form data.")
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/header`, {
+          method: editingId ? "POST" : "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formPayload,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("Form data submitted successfully:", result);
+
+        // Reset form
+        setFormData({
+          itemname: "",
+          itemlink: "",
+          itemname2: "",
+          itemlink2: "",
+          loginlink: "",
+          appstorelink: "",
+          googoleplaylink: "",
+          image: null,
+        });
+        setImagePreview(null);
+
+        alert("Form submitted successfully! Check the console for form data.");
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("Failed to submit the form. Check the console for errors.");
+      }
     } else {
-      console.log("Form has validation errors")
+      console.log("Form has validation errors");
     }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
 
   return (
     <div className="pb-10">
@@ -187,8 +267,10 @@ export default function Page() {
             {imagePreview ? (
               <div className="space-y-2">
                 <Image
-                  src={imagePreview || "/placeholder.svg"}
+                  src={imagePreview && imagePreview !== "" ? imagePreview : "/placeholder.svg"}
                   alt="Preview"
+                  width={200}
+                  height={100}
                   className="max-h-40 mx-auto object-contain"
                 />
                 <p className="text-sm text-gray-500">Click to change image</p>

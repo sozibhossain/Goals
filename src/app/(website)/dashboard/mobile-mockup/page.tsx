@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent, type FormEvent } from "react"
+import { useState, useRef, type ChangeEvent, type FormEvent, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,6 +8,7 @@ import { AlertCircle, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
 import { ColorPicker } from "../footer/_components/color-picker"
+import { useSession } from "next-auth/react"
 
 interface FormData {
   backgroundColor: string
@@ -51,6 +52,8 @@ export default function Page() {
   const backgroundImageRef = useRef<HTMLInputElement>(null)
   const mobileImage2Ref = useRef<HTMLInputElement>(null)
   const mobileImage3Ref = useRef<HTMLInputElement>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -94,27 +97,105 @@ export default function Page() {
     if (!formData.title1.trim()) newErrors.title1 = "Title 1 is required"
     if (!formData.title2.trim()) newErrors.title2 = "Title 2 is required"
     if (!formData.title3.trim()) newErrors.title3 = "Title 3 is required"
-    if (!formData.backgroundImage) newErrors.backgroundImage = "Mobile image 1 is required"
-    if (!formData.mobileImage2) newErrors.mobileImage2 = "Mobile image 2 is required"
-    if (!formData.mobileImage3) newErrors.mobileImage3 = "Mobile image 3 is required"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      console.log("Form data submitted:", {
-        backgroundColor: formData.backgroundColor,
-        title1: formData.title1,
-        title2: formData.title2,
-        title3: formData.title3,
-        backgroundImage: formData.backgroundImage?.name || "No image uploaded",
-        mobileImage2: formData.mobileImage2?.name || "No image uploaded",
-        mobileImage3: formData.mobileImage3?.name || "No image uploaded",
-      })
 
+
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
+
+  useEffect(() => {
+    const fetchMobileMockupData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (data) {
+          const mobilemockup = data;
+          console.log("mobilemockup", mobilemockup);
+
+          setFormData({
+            backgroundColor: mobilemockup.color || "",
+            title1: mobilemockup.title1 || "",
+            title2: mobilemockup.title2 || "",
+            title3: mobilemockup.title3 || "",
+            backgroundImage: null,
+            mobileImage2: null,
+            mobileImage3: null,
+          });
+
+          setEditingId(mobilemockup.id);
+          setSelectedColor(mobilemockup.color || "");
+
+          if (mobilemockup.back_img) {
+            setbackgroundImagePreview(mobilemockup.back_img);
+          }
+          if (mobilemockup.mbl_img1) {
+            setMobileImage2Preview(mobilemockup.mbl_img1);
+          }
+          if (mobilemockup.mbl_img2) {
+            setMobileImage3Preview(mobilemockup.mbl_img2);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading mobilemockup data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMobileMockupData();
+  }, [token]);
+
+
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+  
+    // Validate the form before submitting
+    if (!validateForm()) {
+      console.warn("Form has validation errors");
+      return;
+    }
+  
+    // Prepare form payload using FormData
+    const formPayload = new FormData();
+    formPayload.append("background_color", formData.backgroundColor);
+    formPayload.append("title", formData.title1);
+    formPayload.append("subtitle", formData.title2);
+    formPayload.append("title3", formData.title3);
+  
+    // Add image files to the payload if they exist
+    if (formData.backgroundImage) formPayload.append("img1", formData.backgroundImage);
+    if (formData.mobileImage2) formPayload.append("img2", formData.mobileImage2);
+    if (formData.mobileImage3) formPayload.append("img3", formData.mobileImage3);
+  
+    try {
+      // Send the request to the backend (only POST request)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup`, {
+        method: editingId ? "POST" : "POST", // Always POST
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formPayload,
+      });
+  
+      // Check for a successful response
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  
+      const result = await response.json();
+      console.log("Form submitted successfully:", result);
+      alert("Mobile Mockup data saved successfully!");
+  
+      // Clear the form after successful submission
       setFormData({
         backgroundColor: "",
         title1: "",
@@ -123,15 +204,26 @@ export default function Page() {
         backgroundImage: null,
         mobileImage2: null,
         mobileImage3: null,
-      })
-
-      setSelectedColor("")
-      setbackgroundImagePreview(null)
-      setMobileImage2Preview(null)
-      setMobileImage3Preview(null)
-
-      alert("Form submitted successfully! Check the console for form data.")
+      });
+  
+      // Clear the preview images and other states
+      setbackgroundImagePreview(null);
+      setMobileImage2Preview(null);
+      setMobileImage3Preview(null);
+      setSelectedColor("");
+  
+    } catch (err) {
+      console.error("Form submission error:", err);
+      alert("Failed to submit Mobile Mockup. Check console for details.");
     }
+  };
+  
+  
+  
+
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -308,7 +400,7 @@ export default function Page() {
         )}
 
         <Button type="submit" className="w-full">
-          Submit banner section
+          Submit section
         </Button>
       </form>
     </div>

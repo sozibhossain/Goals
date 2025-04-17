@@ -23,11 +23,11 @@ const DashboardSidebar = () => {
   return (
     <SidebarProvider>
       <Sidebar className="border-r border-border">
-          <SidebarHeader className="hidden md:block lg:block pl-8 pt-4">
-            <Link href="/" className="flex items-center ">
-              <Image src="/assets/headerlogo.png" alt="logo" width={64} height={64} className="w-[64px] h-[64px]" />
-            </Link>
-          </SidebarHeader>
+        <SidebarHeader className="hidden md:block lg:block pl-8 pt-4">
+          <Link href="/" className="flex items-center ">
+            <Image src="/assets/headerlogo.png" alt="logo" width={64} height={64} className="w-[64px] h-[64px]" />
+          </Link>
+        </SidebarHeader>
         <SidebarContent className="px-4">
           <div className="mt-4">
             {Sidebarcontents?.map((item) => (
