@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
+import "../../../../app/globals.css";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -58,6 +58,7 @@ export function LoginForm() {
     } catch (error) {
       if (error) {
         console.error("Login error:", error);
+        toast.error("Login failed");
       }
     } finally {
       setIsLoading(false); // Stop loading state
