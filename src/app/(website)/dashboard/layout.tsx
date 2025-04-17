@@ -5,6 +5,7 @@ import DashboardNavbar from "./_components/dashboard-navbar";
 const AdminDashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="bg-white w-full ">
+      
       <DashboardNavbar />
       <div className="w-full h-full md:flex lg:flex justify-start items-start ">
         <DashboardSidebar />
