@@ -168,15 +168,15 @@ export default function Page() {
   
     // Prepare form payload using FormData
     const formPayload = new FormData();
-    formPayload.append("background_color", formData.backgroundColor);
-    formPayload.append("title", formData.title1);
-    formPayload.append("subtitle", formData.title2);
+    formPayload.append("color", formData.backgroundColor);
+    formPayload.append("title1", formData.title1);
+    formPayload.append("title2", formData.title2);
     formPayload.append("title3", formData.title3);
   
     // Add image files to the payload if they exist
-    if (formData.backgroundImage) formPayload.append("img1", formData.backgroundImage);
-    if (formData.mobileImage2) formPayload.append("img2", formData.mobileImage2);
-    if (formData.mobileImage3) formPayload.append("img3", formData.mobileImage3);
+    if (formData.backgroundImage) formPayload.append("back_img", formData.backgroundImage);
+    if (formData.mobileImage2) formPayload.append("mbl_img1", formData.mobileImage2);
+    if (formData.mobileImage3) formPayload.append("mbl_img2", formData.mobileImage3);
   
     try {
       // Send the request to the backend (only POST request)

@@ -11,7 +11,7 @@ import { ColorPicker } from "../footer/_components/color-picker"
 import { useSession } from "next-auth/react"
 
 interface FormData {
-  backgroundColor: string
+  color: string
   title1: string
   title2: string
   appstorelink?: string
@@ -43,7 +43,7 @@ type ImageFieldKey =
 
 export default function Page() {
   const [formData, setFormData] = useState<FormData>({
-    backgroundColor: "",
+    color: "",
     title1: "",
     title2: "",
     mobileImage1: null,
@@ -110,8 +110,9 @@ export default function Page() {
   }
 
   const handleColorChange = (color: string) => {
+    console.log(color)
     setSelectedColor(color)
-    setFormData((prev) => ({ ...prev, backgroundColor: color }))
+    setFormData((prev) => ({ ...prev, color: color }))
   }
 
   const validateForm = (): boolean => {
@@ -142,10 +143,10 @@ export default function Page() {
 
         if (data) {
           const feature = data;
-          console.log("feature", feature);
+          // console.log("feature", feature);
 
           setFormData({
-            backgroundColor: feature.color || "",
+            color: feature.color || "",
             title1: feature.title1 || "",
             title2: feature.title2 || "",
             allmobileImage: feature.all_mbl_img || null,
@@ -178,24 +179,24 @@ export default function Page() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     if (!validateForm()) {
       console.warn("Form has validation errors");
       return;
     }
-  
+
     const formPayload = new FormData();
-    formPayload.append("background_color", formData.backgroundColor);
+    formPayload.append("color", formData.color);
     formPayload.append("title1", formData.title1); // ✅ Fixed key
     formPayload.append("title2", formData.title2); // ✅ Fixed key
-  
+
     // Append images if available
     if (formData.mobileImage1) formPayload.append("mobile_img1", formData.mobileImage1);
     if (formData.mobileImage2) formPayload.append("mobile_img2", formData.mobileImage2);
     if (formData.mobileImage3) formPayload.append("mobile_img3", formData.mobileImage3);
     if (formData.mobileImage4) formPayload.append("mobile_img4", formData.mobileImage4);
     if (formData.allmobileImage) formPayload.append("all_mobile_img", formData.allmobileImage);
-  
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/feature`, {
         method: editingId ? "POST" : "POST",
@@ -204,16 +205,16 @@ export default function Page() {
         },
         body: formPayload,
       });
-  
+
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  
+
       const result = await response.json();
       console.log("Form submitted successfully:", result);
       alert("Mobile Mockup data saved successfully!");
-  
+      console.log(formData)
       // Reset form and previews
       setFormData({
-        backgroundColor: "",
+        color: "",
         title1: "",
         title2: "",
         mobileImage1: null,
@@ -222,21 +223,21 @@ export default function Page() {
         mobileImage4: null,
         allmobileImage: null,
       });
-  
+
       setSelectedColor("");
       setMobileImage1Preview(null);
       setMobileImage2Preview(null);
       setMobileImage3Preview(null);
       setMobileImage4Preview(null);
       setAllmobileImagePreview(null);
-  
+
     } catch (err) {
       console.error("Form submission error:", err);
       alert("Failed to submit Mobile Mockup. Check console for details.");
     }
   };
-  
-  
+
+
 
 
   const renderImageInput = (
@@ -297,7 +298,7 @@ export default function Page() {
           <ColorPicker
             selectedColor={selectedColor}  // the current color selected by the user
             onColorChange={handleColorChange}  // function to update the selected color
-            previousColor={formData.backgroundColor}  // the color that was previously saved or loaded
+            previousColor={formData.color}  // the color that was previously saved or loaded
           />
         </div>
 

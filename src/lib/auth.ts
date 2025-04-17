@@ -33,10 +33,10 @@ export const authOptions: NextAuthOptions = {
           const data = await res.json();
           console.log("Auth API Response:", data);
 
-          if (!res.ok || !data?.user || !data?.user?.id || !data?.token) {
-            throw new Error(data.message || "Invalid credentials");
-          }
-
+          // if (!res.ok || !data?.user || !data?.user?.id || !data?.token) {
+          //   throw new Error(data.message || "Invalid credentials");
+          // }
+ 
           return {
             id: data?.id,
             name: data?.name,
