@@ -11,9 +11,10 @@ import {
 type logoutModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void
 };
 
-const LogoutModal = ({ isOpen, onClose }: logoutModalProps) => {
+const LogoutModal = ({ isOpen, onClose, onConfirm }: logoutModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[420px]">
@@ -24,7 +25,7 @@ const LogoutModal = ({ isOpen, onClose }: logoutModalProps) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="w-full flex items-center justify-end gap-7 mt-5">
-          <button className="text-white bg-primary py-[8px] px-6 text-sm font-medium leading-[120%] rounded-[8px]" >Yes</button>
+          <button className="text-white bg-primary py-[8px] px-6 text-sm font-medium leading-[120%] rounded-[8px]" onClick={onConfirm}>Yes</button>
           <button className="text-base font-medium bg-green-600 text-white leading-[120%] py-[8px] px-[18px] rounded-lg shadow-none border-none" onClick={onClose}>No</button>
         </DialogFooter>
       </DialogContent>
