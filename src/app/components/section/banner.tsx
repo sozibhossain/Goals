@@ -5,7 +5,6 @@ import Link from "next/link"
 
 
 export default function Banner({ bannerData }: { bannerData: BannerData }) {
-    console.log("sozib", bannerData);
 
     return (
         <section className="relative w-full lg:h-screen h-[70vh] overflow-hidden rounded-t-[20px] mt-[-130px]">

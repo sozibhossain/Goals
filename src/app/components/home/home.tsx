@@ -45,6 +45,11 @@ function Home() {
     if (error) return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
     if (!homeData) return <div className="flex justify-center items-center h-screen">No data available</div>;
 
+
+    // console.log(homeData.header[0].itemlink1);
+    const featuresId = homeData.header[0].itemlink1.replace("#", "");
+    const contactId = homeData.header[0].itemlink2.replace("#", "");
+
     return (
         <div>
             {homeData.header && homeData.header[0] && (
@@ -55,7 +60,7 @@ function Home() {
                 <Banner bannerData={homeData.home[0]} />
             )}
 
-            <div id='feature'>
+            <div id={featuresId}>
                 {homeData.feature && homeData.feature[0] && (
                     <FeatureSection featureData={homeData.feature[0]} />
                 )}
@@ -69,7 +74,7 @@ function Home() {
                 <UiCarouselMain achiveData={homeData.achive[0]} />
             )}
 
-            <div id='contact'>
+            <div id={contactId}>
                 {homeData.footer && homeData.footer[0] && (
                     <FooterSections footerData={homeData.footer[0]} />
                 )}
