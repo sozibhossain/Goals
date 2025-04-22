@@ -14,19 +14,15 @@ interface FormData {
   color: string
   title1: string
   title2: string
-  appstorelink?: string
-  googoleplaylink?: string
-  loginlink?: string
-  mobileImage1: File | null
-  mobileImage2: File | null
-  mobileImage3: File | null
-  mobileImage4: File | null
-  allmobileImage: File | null
+  mobileImage1: File | string | null
+  mobileImage2: File | string | null
+  mobileImage3: File | string | null
+  mobileImage4: File | string | null
+  allmobileImage: File | string | null
 }
 
 interface FormErrors {
   title1?: string
-  title2?: string
   mobileImage1?: string
   mobileImage2?: string
   mobileImage3?: string
@@ -63,6 +59,8 @@ export default function Page() {
   const [allmobileImagePreview, setAllmobileImagePreview] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+
+ 
 
   const previewSetters: Record<ImageFieldKey, React.Dispatch<React.SetStateAction<string | null>>> = {
     mobileImage1: setMobileImage1Preview,
@@ -110,9 +108,8 @@ export default function Page() {
   }
 
   const handleColorChange = (color: string) => {
-    console.log(color)
     setSelectedColor(color)
-    setFormData((prev) => ({ ...prev, color: color }))
+    setFormData((prev) => ({ ...prev, color }))
   }
 
   const validateForm = (): boolean => {
@@ -127,101 +124,85 @@ export default function Page() {
     return Object.keys(newErrors).length === 0
   }
 
-  const session = useSession();
+  const session = useSession()
   const token = (session?.data?.user as { token: string })?.token
 
   useEffect(() => {
-    const fetchfeatureData = async () => {
+    const fetchFeatureData = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/feature`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
-        const data = await response.json();
-
-        if (data) {
-          const feature = data;
-          // console.log("feature", feature);
-
+        const feature = await response.json()
+        if (feature) {
           setFormData({
             color: feature.color || "",
             title1: feature.title1 || "",
             title2: feature.title2 || "",
-            allmobileImage: feature.all_mbl_img || null,
             mobileImage1: feature.mbl_img1 || null,
             mobileImage2: feature.mbl_img2 || null,
             mobileImage3: feature.mbl_img3 || null,
             mobileImage4: feature.mbl_img4 || null,
-          });
+            allmobileImage: feature.all_mbl_img || null,
+          })
 
-          setEditingId(feature.id);
-          setSelectedColor(feature.color || "");
-
-          // Set previews for images
-          setAllmobileImagePreview(feature.all_mbl_img || null);
-          setMobileImage1Preview(feature.mbl_img1 || null);
-          setMobileImage2Preview(feature.mbl_img2 || null);
-          setMobileImage3Preview(feature.mbl_img3 || null);
-          setMobileImage4Preview(feature.mbl_img4 || null);
+          setEditingId(feature.id)
+          setSelectedColor(feature.color || "")
+          setMobileImage1Preview(feature.mbl_img1 || null)
+          setMobileImage2Preview(feature.mbl_img2 || null)
+          setMobileImage3Preview(feature.mbl_img3 || null)
+          setMobileImage4Preview(feature.mbl_img4 || null)
+          setAllmobileImagePreview(feature.all_mbl_img || null)
         }
       } catch (err) {
-        console.error("Error loading feature data", err);
+        console.error("Error loading feature data", err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    fetchfeatureData();
-  }, [token]);
-
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      console.warn("Form has validation errors");
-      return;
     }
 
-    const formPayload = new FormData();
-    formPayload.append("color", formData.color);
-    formPayload.append("title1", formData.title1); // ✅ Fixed key
-    formPayload.append("title2", formData.title2); // ✅ Fixed key
+    fetchFeatureData()
+  }, [token])
 
-    // Append images if available
-    if (formData.mobileImage1) formPayload.append("mobile_img1", formData.mobileImage1);
-    if (formData.mobileImage2) formPayload.append("mobile_img2", formData.mobileImage2);
-    if (formData.mobileImage3) formPayload.append("mobile_img3", formData.mobileImage3);
-    if (formData.mobileImage4) formPayload.append("mobile_img4", formData.mobileImage4);
-    if (formData.allmobileImage) formPayload.append("all_mobile_img", formData.allmobileImage);
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) return
+
+    const formPayload = new FormData()
+    formPayload.append("color", formData.color)
+    formPayload.append("title1", formData.title1)
+    formPayload.append("title2", formData.title2)
+
+    if (formData.mobileImage1 instanceof File) formPayload.append("mbl_img1", formData.mobileImage1)
+    if (formData.mobileImage2 instanceof File) formPayload.append("mbl_img2", formData.mobileImage2)
+    if (formData.mobileImage3 instanceof File) formPayload.append("mbl_img3", formData.mobileImage3)
+    if (formData.mobileImage4 instanceof File) formPayload.append("mbl_img4", formData.mobileImage4)
+    if (formData.allmobileImage instanceof File) formPayload.append("all_mbl_img", formData.allmobileImage)
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/feature`, {
-        method: editingId ? "POST" : "POST",
+        method: editingId ? "POST" : "POST", // 🔒 Force POST only
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: formPayload,
-      });
+      })
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
 
-      const result = await response.json();
-      console.log("Form submitted successfully:", result);
-      alert("Mobile Mockup data saved successfully!");
-      console.log(formData)
-      
+      const result = await response.json()
+      alert("Mobile Mockup data saved successfully!")
+      console.log("Form Submitted:", result)
 
     } catch (err) {
-      console.error("Form submission error:", err);
-      alert("Failed to submit Mobile Mockup. Check console for details.");
+      console.error("Form submission error:", err)
+      alert("Failed to submit. Check console for details.")
     }
-  };
-
-
-
+  }
 
   const renderImageInput = (
     label: string,
@@ -266,26 +247,23 @@ export default function Page() {
     </div>
   )
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>
 
   return (
     <div className="pb-10">
       <h1 className="text-2xl font-bold mb-6">Features Area</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Background Color Picker */}
         <div className="space-y-2">
           <Label>Background Color</Label>
           <ColorPicker
-            selectedColor={selectedColor}  // the current color selected by the user
-            onColorChange={handleColorChange}  // function to update the selected color
-            previousColor={formData.color}  // the color that was previously saved or loaded
+            selectedColor={selectedColor}
+            onColorChange={handleColorChange}
+            previousColor={formData.color}
           />
         </div>
 
-        {/* Mobile Image Uploads */}
+        {/* Mobile Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {renderImageInput("Upload mobile image 1", "mobileImage1", mobileImage1Preview, errors.mobileImage1)}
           {renderImageInput("Upload mobile image 2", "mobileImage2", mobileImage2Preview, errors.mobileImage2)}
@@ -296,47 +274,30 @@ export default function Page() {
         {/* Title 1 */}
         <div className="space-y-2">
           <Label htmlFor="title1">Title 1</Label>
-          <Input
-            id="title1"
-            name="title1"
-            value={formData.title1}
-            onChange={handleInputChange}
-          />
-          {errors.title1 && (
-            <p className="text-sm text-red-500">{errors.title1}</p>
-          )}
+          <Input id="title1" name="title1" value={formData.title1} onChange={handleInputChange} />
+          {errors.title1 && <p className="text-sm text-red-500">{errors.title1}</p>}
         </div>
 
-        {/* All Mobile Image Upload */}
+        {/* All Mobile Image */}
         {renderImageInput("Upload all mobile image", "allmobileImage", allmobileImagePreview, errors.allmobileImage)}
 
         {/* Title 2 */}
         <div className="space-y-2">
           <Label htmlFor="title2">Title 2</Label>
-          <Input
-            id="title2"
-            name="title2"
-            value={formData.title2}
-            onChange={handleInputChange}
-          />
+          <Input id="title2" name="title2" value={formData.title2} onChange={handleInputChange} />
         </div>
 
         {/* Validation Alert */}
         {Object.keys(errors).length > 0 && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Please fix the errors above before submitting the form.
-            </AlertDescription>
+            <AlertDescription>Please fix the errors above before submitting the form.</AlertDescription>
           </Alert>
         )}
 
-        {/* Submit Button */}
-        <Button type="submit" className="w-full">
-          Submit banner section
-        </Button>
+        {/* Submit */}
+        <Button type="submit" className="w-full">Submit banner section</Button>
       </form>
-
     </div>
   )
 }
