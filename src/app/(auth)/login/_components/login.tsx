@@ -4,34 +4,35 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import "../../../../app/globals.css";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { FaRegEye } from "react-icons/fa6";
-import { FaRegEyeSlash } from "react-icons/fa6";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
+// Schema validation
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  //eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // Check if the user already has a session token
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("next-auth.session-token="))
+    ?.split("=")[1];
+
+  // If a token exists, redirect them to the dashboard
+  if (token) {
+    router.push("/dashboard");
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,6 +42,7 @@ export function LoginForm() {
     },
   });
 
+  // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
@@ -49,6 +51,7 @@ export function LoginForm() {
         password: values.password,
         redirect: false,
       });
+
       if (result?.error) {
         throw new Error(result.error);
       }
@@ -69,9 +72,7 @@ export function LoginForm() {
     <div className="w-full max-w-md">
       <div className="space-y-2 mb-6">
         <h1 className="text-3xl font-bold">Login to Account</h1>
-        <p className="text-muted-foreground">
-          Please enter your email and password to continue
-        </p>
+        <p className="text-muted-foreground">Please enter your email and password to continue</p>
       </div>
 
       <Form {...form}>

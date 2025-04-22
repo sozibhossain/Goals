@@ -232,19 +232,6 @@ export default function Page() {
       const result = await response.json();
       console.log("Banner form submitted successfully:", result);
   
-      // Reset form
-      setFormData({
-        title: "",
-        subtitle: "",
-        appstorelink: "",
-        googoleplaylink: "",
-        loginlink: "",
-        backgroundImage: null,
-        mobileImage: null,
-      });
-      setBackgroundImagePreview(null);
-      setMobileImagePreview(null);
-  
       alert("Form submitted successfully! Check the console for response data.");
     } catch (error) {
       console.error("Error submitting banner form:", error);

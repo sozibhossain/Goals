@@ -27,7 +27,7 @@ export function ContactForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/send-email', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contactMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

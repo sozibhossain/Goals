@@ -159,25 +159,25 @@ export default function Page() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     // Validate the form before submitting
     if (!validateForm()) {
       console.warn("Form has validation errors");
       return;
     }
-  
+
     // Prepare form payload using FormData
     const formPayload = new FormData();
     formPayload.append("color", formData.backgroundColor);
     formPayload.append("title1", formData.title1);
     formPayload.append("title2", formData.title2);
     formPayload.append("title3", formData.title3);
-  
+
     // Add image files to the payload if they exist
     if (formData.backgroundImage) formPayload.append("back_img", formData.backgroundImage);
     if (formData.mobileImage2) formPayload.append("mbl_img1", formData.mobileImage2);
     if (formData.mobileImage3) formPayload.append("mbl_img2", formData.mobileImage3);
-  
+
     try {
       // Send the request to the backend (only POST request)
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mobilemockup`, {
@@ -187,39 +187,26 @@ export default function Page() {
         },
         body: formPayload,
       });
-  
+
       // Check for a successful response
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  
+
       const result = await response.json();
       console.log("Form submitted successfully:", result);
       alert("Mobile Mockup data saved successfully!");
-  
-      // Clear the form after successful submission
-      setFormData({
-        backgroundColor: "",
-        title1: "",
-        title2: "",
-        title3: "",
-        backgroundImage: null,
-        mobileImage2: null,
-        mobileImage3: null,
-      });
-  
-      // Clear the preview images and other states
-      setbackgroundImagePreview(null);
-      setMobileImage2Preview(null);
-      setMobileImage3Preview(null);
-      setSelectedColor("");
-  
+
+   
+
+      
+
     } catch (err) {
       console.error("Form submission error:", err);
       alert("Failed to submit Mobile Mockup. Check console for details.");
     }
   };
-  
-  
-  
+
+
+
 
 
   if (loading) {

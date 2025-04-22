@@ -216,18 +216,7 @@ export default function Page() {
         const result = await response.json();
         console.log("Form data submitted successfully:", result);
 
-        // Reset form
-        setFormData({
-          itemname: "",
-          itemlink: "",
-          itemname2: "",
-          itemlink2: "",
-          loginlink: "",
-          appstorelink: "",
-          googoleplaylink: "",
-          image: null,
-        });
-        setImagePreview(null);
+        
 
         alert("Form submitted successfully! Check the console for form data.");
       } catch (error) {
