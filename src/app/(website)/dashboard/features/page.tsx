@@ -212,24 +212,7 @@ export default function Page() {
       console.log("Form submitted successfully:", result);
       alert("Mobile Mockup data saved successfully!");
       console.log(formData)
-      // Reset form and previews
-      setFormData({
-        color: "",
-        title1: "",
-        title2: "",
-        mobileImage1: null,
-        mobileImage2: null,
-        mobileImage3: null,
-        mobileImage4: null,
-        allmobileImage: null,
-      });
-
-      setSelectedColor("");
-      setMobileImage1Preview(null);
-      setMobileImage2Preview(null);
-      setMobileImage3Preview(null);
-      setMobileImage4Preview(null);
-      setAllmobileImagePreview(null);
+      
 
     } catch (err) {
       console.error("Form submission error:", err);

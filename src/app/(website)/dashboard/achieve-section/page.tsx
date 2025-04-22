@@ -176,21 +176,21 @@ export default function Page() {
       const result = await response.json()
       console.log("Form data submitted successfully:", result)
 
-      setFormData({
-        title1: "",
-        title2: "",
-        backgroundImage: null,
-        mobileImage2: null,
-        mobileImage3: null,
-        mobileImage4: null,
-        logoImage: null,
-      })
+      // setFormData({
+      //   title1: "",
+      //   title2: "",
+      //   backgroundImage: null,
+      //   mobileImage2: null,
+      //   mobileImage3: null,
+      //   mobileImage4: null,
+      //   logoImage: null,
+      // })
 
-      setbackgroundImagePreview(null)
-      setMobileImage2Preview(null)
-      setMobileImage3Preview(null)
-      setMobileImage4Preview(null)
-      setlogoImagePreview(null)
+      // setbackgroundImagePreview(null)
+      // setMobileImage2Preview(null)
+      // setMobileImage3Preview(null)
+      // setMobileImage4Preview(null)
+      // setlogoImagePreview(null)
 
       alert("Mobile mockup submitted successfully!")
     } catch (error) {
