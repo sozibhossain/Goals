@@ -14,21 +14,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { HeaderData } from '@/types/home'
 
-// type HeaderData = {
-//     id: number;
-//     img: string;
-//     item_name1: string;
-//     itemlink1: string;
-//     item_name2: string;
-//     itemlink2: string;
-//     login_link: string;
-//     app_store_link: string;
-//     google_play_link: string;
-//     created_at: string;
-//     updated_at: string;
-// };
-
-
 export default function Header({ headerData }: {headerData: HeaderData}) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     

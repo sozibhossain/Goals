@@ -1,4 +1,5 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -8,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
@@ -24,15 +25,18 @@ export function LoginForm() {
   const router = useRouter();
 
   // Check if the user already has a session token
-  const token = document.cookie
-    .split("; ")
-    .find((cookie) => cookie.startsWith("next-auth.session-token="))
-    ?.split("=")[1];
+  useEffect(() => {
+    // Check if the user already has a session token
+    const token = document.cookie
+      .split("; ")
+      .find((cookie) => cookie.startsWith("next-auth.session-token="))
+      ?.split("=")[1];
 
-  // If a token exists, redirect them to the dashboard
-  if (token) {
-    router.push("/dashboard");
-  }
+    // If a token exists, redirect them to the dashboard
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
