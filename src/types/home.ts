@@ -59,6 +59,9 @@ export interface FooterData {
     login_link: string;
     app_store_link: string;
     google_play_link: string;
+    first_text_color: string;
+    second_text_color: string;
+    third_text_color: string;
     first_text: string;
     second_text: string;
     third_text: string;

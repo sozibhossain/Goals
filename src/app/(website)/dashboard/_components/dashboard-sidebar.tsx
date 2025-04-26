@@ -1,7 +1,7 @@
 "use client"
 
 import { Sidebarcontents } from "@/data/admin-dashboard-data"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -17,10 +17,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { toast } from "react-toastify";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { HeaderData } from "@/types/home"
 
 const DashboardSidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [headerData, setHeaderData] = useState<HeaderData | null>(null);
+
+
 
 
   const handleLogout = async () => {
@@ -36,12 +40,41 @@ const DashboardSidebar = () => {
     }
   };
 
+  const session = useSession();
+  const token = (session?.data?.user as { token: string })?.token
+
+  useEffect(() => {
+    const fetchHeaderData = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/header`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        setHeaderData(data); // Assuming your API response is { data: {...} }
+      } catch (error) {
+        console.error("Failed to fetch header data:", error);
+      } 
+    };
+  
+    fetchHeaderData();
+  }, [token]);
+
+  
+
   return (
     <SidebarProvider>
       <Sidebar className="border-r border-border">
-        <SidebarHeader className="hidden md:block lg:block pl-8 pt-4">
-          <Link href="/" className="flex items-center ">
-            <Image src="/assets/headerlogo.png" alt="logo" width={64} height={64} className="w-[64px] h-[64px]" />
+        <SidebarHeader className=" lg:block pl-8 pt-4">
+          <Link href="/" className="flex items-center">
+            <Image
+              src={headerData?.img || "/default-logo.png"}
+              alt="logo"
+              width={64}
+              height={64}
+              className="w-[64px] h-[64px]" />
           </Link>
         </SidebarHeader>
         <SidebarContent className="px-4">
