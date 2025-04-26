@@ -93,7 +93,7 @@ export default function Header({ headerData }: { headerData: HeaderData }) {
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
-                                src="/assets/headerlogo.png"
+                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/headers/${headerData.img}`}
                                 width={68}
                                 height={68}
                                 className="w-[68px] h-[68px]"
