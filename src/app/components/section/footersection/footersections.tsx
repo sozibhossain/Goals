@@ -72,7 +72,7 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
               <div className="col-span-12 lg:col-span-3">
                 <h3 className="flex justify-center mb-2 lg:mb-8 text-xl font-normal">Why use Goals</h3>
                 <div className="bg-white p-6 rounded-md h-full">
-                <div dangerouslySetInnerHTML={{ __html: footerData?.third_text }} />
+                  <div dangerouslySetInnerHTML={{ __html: footerData?.third_text }} />
                 </div>
               </div>
               {/* Contact Form Section */}
@@ -89,8 +89,8 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
 
 
         {/* Copyright */}
-        <div className="mt-[80px] text-sm text-center lg:text-start">
-        <p>{`${new Date().getFullYear()} © Goals by Splurij`}</p>
+        <div className="mt-[80px] text-sm text-center lg:text-end">
+          <p>{`${new Date().getFullYear()} © Goals by Splurij`}</p>
         </div>
       </div>
     </footer>

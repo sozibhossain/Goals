@@ -18,19 +18,20 @@ const QuillEditor = dynamic(() => import("./_components/quill-editor"), {
 
 interface FormData {
   backgroundColor: string
-  loginlink: string
   appstorelink: string
   googleplaylink: string
   whatWeDo: string
   whoWeAre: string
   whyUseGoals: string
+  whatWeDoColor: string
+  whoWeAreColor: string
+  whyUseGoalsColor: string
   imageFile: File | null
   existingImageName: string
 }
 
 interface FormErrors {
   imageFile?: string
-  loginlink?: string
   appstorelink?: string
   googleplaylink?: string
   whatWeDo?: string
@@ -42,18 +43,19 @@ export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState<FormData>({
     backgroundColor: "",
-    loginlink: "",
     appstorelink: "",
     googleplaylink: "",
     whatWeDo: "",
     whoWeAre: "",
     whyUseGoals: "",
+    whatWeDoColor: "",
+    whoWeAreColor: "",
+    whyUseGoalsColor: "",
     imageFile: null,
     existingImageName: "",
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedColor, setSelectedColor] = useState<string>("")
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -80,21 +82,22 @@ export default function Page() {
 
           setFormData({
             backgroundColor: footer.color || "",
-            loginlink: footer.login_link || "",
             appstorelink: footer.app_store_link || "",
             googleplaylink: footer.google_play_link || "",
             whatWeDo: footer.first_text || "",
             whoWeAre: footer.second_text || "",
             whyUseGoals: footer.third_text || "",
+            whatWeDoColor: footer.first_text_color || "",
+            whoWeAreColor: footer.second_text_color || "",
+            whyUseGoalsColor: footer.third_text_color || "",
             imageFile: null,
             existingImageName: logoImageName,
           })
 
-          setSelectedColor(footer.color || "")
           setEditingId(footer.id)
 
           if (logoImageName) {
-            setImagePreview(`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads//settings/${logoImageName}`)
+            setImagePreview(`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/settings/${logoImageName}`)
           }
         }
       } catch (err) {
@@ -150,10 +153,10 @@ export default function Page() {
     }
   }
 
-  const handleColorChange = (color: string) => {
+  const handleColorChange = (color: string, field: keyof FormData) => {
     setFormData((prev) => ({
       ...prev,
-      backgroundColor: color,
+      [field]: color,
     }))
   }
 
@@ -163,12 +166,6 @@ export default function Page() {
 
     if (!formData.imageFile && !formData.existingImageName) {
       newErrors.imageFile = "Please upload a logo image"
-    }
-
-    if (!formData.loginlink) {
-      newErrors.loginlink = "Login link is required"
-    } else if (!urlRegex.test(formData.loginlink)) {
-      newErrors.loginlink = "Please enter a valid URL"
     }
 
     if (formData.appstorelink && !urlRegex.test(formData.appstorelink)) {
@@ -209,12 +206,14 @@ export default function Page() {
     
     // Append all fields to FormData
     formPayload.append("color", formData.backgroundColor)
-    formPayload.append("login_link", formData.loginlink)
     formPayload.append("app_store_link", formData.appstorelink)
     formPayload.append("google_play_link", formData.googleplaylink)
     formPayload.append("first_text", formData.whatWeDo)
+    formPayload.append("first_text_color", formData.whatWeDoColor)
     formPayload.append("second_text", formData.whoWeAre)
+    formPayload.append("second_text_color", formData.whoWeAreColor)
     formPayload.append("third_text", formData.whyUseGoals)
+    formPayload.append("third_text_color", formData.whyUseGoalsColor)
     
     // Only append the image if a new one was uploaded
     if (formData.imageFile) {
@@ -259,17 +258,18 @@ export default function Page() {
   const resetForm = () => {
     setFormData({
       backgroundColor: "",
-      loginlink: "",
       appstorelink: "",
       googleplaylink: "",
       whatWeDo: "",
       whoWeAre: "",
       whyUseGoals: "",
+      whatWeDoColor: "",
+      whoWeAreColor: "",
+      whyUseGoalsColor: "",
       imageFile: null,
       existingImageName: "",
     })
     setErrors({})
-    setSelectedColor("")
     setImagePreview(null)
   }
 
@@ -286,8 +286,8 @@ export default function Page() {
           <Label htmlFor="backgroundColor">Background Color</Label>
           <div className="mt-0">
             <ColorPicker
-              selectedColor={selectedColor}
-              onColorChange={handleColorChange}
+              selectedColor={formData.backgroundColor}
+              onColorChange={(color) => handleColorChange(color, "backgroundColor")}
               previousColor={formData.backgroundColor}
             />
           </div>
@@ -340,19 +340,6 @@ export default function Page() {
             {/* Other form inputs for login, app store, etc. */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="loginlink">Log in</Label>
-                <Input
-                  id="loginlink"
-                  name="loginlink"
-                  placeholder="https://example.com/login"
-                  value={formData.loginlink}
-                  onChange={handleInputChange}
-                  className={errors.loginlink ? "border-red-500" : ""}
-                />
-                {errors.loginlink && <p className="text-sm text-red-500 mt-1">{errors.loginlink}</p>}
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="appstorelink">App store</Label>
                 <Input
                   id="appstorelink"
@@ -381,9 +368,19 @@ export default function Page() {
           </div>
 
           <div className="space-y-6">
-            {/* Quill editors for "What We Do", "Who We Are", and "Why Use Goals" */}
+            {/* What We Do Section */}
             <div className="space-y-2">
-              <Label htmlFor="whatWeDo">What we do</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="whatWeDo">What we do</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm text-gray-500">Text Color:</Label>
+                  <ColorPicker
+                    selectedColor={formData.whatWeDoColor}
+                    onColorChange={(color) => handleColorChange(color, "whatWeDoColor")}
+                    previousColor={formData.whatWeDoColor}
+                  />
+                </div>
+              </div>
               <QuillEditor
                 value={formData.whatWeDo}
                 onChange={(value) => handleEditorChange("whatWeDo", value)}
@@ -392,8 +389,19 @@ export default function Page() {
               {errors.whatWeDo && <p className="text-sm text-red-500 mt-1">{errors.whatWeDo}</p>}
             </div>
 
+            {/* Who We Are Section */}
             <div className="space-y-2">
-              <Label htmlFor="whoWeAre">Who we are</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="whoWeAre">Who we are</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm text-gray-500">Text Color:</Label>
+                  <ColorPicker
+                    selectedColor={formData.whoWeAreColor}
+                    onColorChange={(color) => handleColorChange(color, "whoWeAreColor")}
+                    previousColor={formData.whoWeAreColor}
+                  />
+                </div>
+              </div>
               <QuillEditor
                 value={formData.whoWeAre}
                 onChange={(value) => handleEditorChange("whoWeAre", value)}
@@ -402,8 +410,19 @@ export default function Page() {
               {errors.whoWeAre && <p className="text-sm text-red-500 mt-1">{errors.whoWeAre}</p>}
             </div>
 
+            {/* Why Use Goals Section */}
             <div className="space-y-2">
-              <Label htmlFor="whyUseGoals">Why use goals</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="whyUseGoals">Why use goals</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm text-gray-500">Text Color:</Label>
+                  <ColorPicker
+                    selectedColor={formData.whyUseGoalsColor}
+                    onColorChange={(color) => handleColorChange(color, "whyUseGoalsColor")}
+                    previousColor={formData.whyUseGoalsColor}
+                  />
+                </div>
+              </div>
               <QuillEditor
                 value={formData.whyUseGoals}
                 onChange={(value) => handleEditorChange("whyUseGoals", value)}
