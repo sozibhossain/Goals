@@ -15,9 +15,9 @@ export default function FeatureSection({featureData}: {featureData: FeatureData}
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/features/${featureData?.mbl_img1}`}
                     alt="Goals app dark theme interface"
-                    width={100}
-                    height={100}
-                    className="w-[150px] h-[200px] md:w-[150px] md:h-[350px] lg:w-[300px] lg:h-[400px]"
+                    width={500}
+                    height={500}
+                    className="w-[150px] h-[200px] md:w-[150px] md:h-[350px] lg:w-[200px] lg:h-[400px]"
                   />
                 </div>
 
@@ -26,8 +26,8 @@ export default function FeatureSection({featureData}: {featureData: FeatureData}
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/features/${featureData?.mbl_img2}`}
                     alt="Goals app chat interface"
-                    width={100}
-                    height={100}
+                    width={500}
+                    height={500}
                     className="w-[150px] h-[200px] md:w-[150px] md:h-[350px] lg:w-[300px] lg:h-[400px]"
                   />
                 </div>
@@ -37,8 +37,8 @@ export default function FeatureSection({featureData}: {featureData: FeatureData}
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/features/${featureData?.mbl_img3}`}
                     alt="Goals app login screen"
-                    width={100}
-                    height={100}
+                    width={500}
+                    height={500}
                     className="w-[250px] h-[200px] md:w-[200px] md:h-[350px] lg:w-[300px] lg:h-[400px]"
                   />
                 </div>
@@ -48,8 +48,8 @@ export default function FeatureSection({featureData}: {featureData: FeatureData}
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/features/${featureData?.mbl_img4}`}
                     alt="Goals app finance goals"
-                    width={100}
-                    height={100}
+                    width={500}
+                    height={500}
                     className="w-[150px] h-[200px] md:w-[150px] md:h-[350px] lg:w-[300px] lg:h-[400px]"
                   />
                 </div>
@@ -75,8 +75,8 @@ export default function FeatureSection({featureData}: {featureData: FeatureData}
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/features/${featureData?.all_mbl_img}`}
                     alt="Mobile view screenshot"
-                    width={300}
-                    height={300}
+                    width={500}
+                    height={500}
                     className="w-[600px] h-[250px] md:w-[600px] md:h-[400px] lg:w-[600px] lg:h-[400px]"
                   />
 
