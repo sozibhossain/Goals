@@ -7,7 +7,7 @@ import Link from "next/link"
 export default function Banner({ bannerData }: { bannerData: BannerData }) {
 
     return (
-        <section className="relative w-full lg:h-screen h-[70vh] overflow-hidden rounded-t-[20px] mt-[-130px]">
+        <section className="relative w-full lg:h-screen h-[70vh] overflow-hidden rounded-t-[20px] mt-[-30px] lg:mt-[-130px]">
             {/* {/ / Background Image / /} */}
             <div className="absolute inset-0 z-0">
                 <Image

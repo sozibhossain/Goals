@@ -1,6 +1,6 @@
 'use client'
 
-import {  useState } from 'react'
+import { useState } from 'react'
 import {
     Dialog,
     DialogPanel,
@@ -14,9 +14,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { HeaderData } from '@/types/home'
 
-export default function Header({ headerData }: {headerData: HeaderData}) {
+export default function Header({ headerData }: { headerData: HeaderData }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    
+
 
     return (
         <header className="bg-[#D9D9D9] rounded-[20px] sticky top-0 z-50">
@@ -87,9 +87,9 @@ export default function Header({ headerData }: {headerData: HeaderData}) {
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
                 <div className="fixed inset-0 z-10" />
-                <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
-                        <a href="#" className="-m-1.5 p-1.5">
+                        <Link href="/" className="-m-1.5 p-1.5">
                             <span className="sr-only">Your Company</span>
                             <Image
                                 alt="Logo"
@@ -98,7 +98,7 @@ export default function Header({ headerData }: {headerData: HeaderData}) {
                                 height={68}
                                 className="w-[68px] h-[68px]"
                             />
-                        </a>
+                        </Link>
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
@@ -114,12 +114,14 @@ export default function Header({ headerData }: {headerData: HeaderData}) {
                                 <Link
                                     href={headerData?.itemlink1 || "#"}
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-gray-50"
+                                    onClick={() => setMobileMenuOpen(false)}
                                 >
                                     {headerData?.item_name1 || "Features"}
                                 </Link>
                                 <Link
                                     href={headerData?.itemlink2 || "#"}
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-black hover:bg-gray-50"
+                                    onClick={() => setMobileMenuOpen(false)}
                                 >
                                     {headerData?.item_name2 || "Contact Us"}
                                 </Link>
@@ -128,11 +130,14 @@ export default function Header({ headerData }: {headerData: HeaderData}) {
                                 <Link
                                     href={headerData?.login_link || "#"}
                                     className="-mx-3 block mb-4 rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                    onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Log in
                                 </Link>
                                 <div className='mb-4'>
-                                    <Link href={headerData?.app_store_link || "/assets/appstore.webp"} className="w-[177px]">
+                                    <Link href={headerData?.app_store_link || "/assets/appstore.webp"} className="w-[177px]"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
                                         <Image
                                             src="/assets/appstore.webp"
                                             width={140}
@@ -143,7 +148,9 @@ export default function Header({ headerData }: {headerData: HeaderData}) {
                                     </Link>
                                 </div>
                                 <div>
-                                    <Link href={headerData?.google_play_link || "/assets/googleplay.webp"} className="w-[199px]">
+                                    <Link href={headerData?.google_play_link || "/assets/googleplay.webp"} className="w-[199px]"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
                                         <Image
                                             src="/assets/googleplay.webp"
                                             width={199}
