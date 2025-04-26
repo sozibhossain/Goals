@@ -117,8 +117,8 @@ export default function Page() {
     }
 
     // Login link validation - should be a valid URL
-    if (formData.loginlink && !isValidUrl(formData.loginlink)) {
-      newErrors.loginlink = "Login link must be a valid URL (start with http:// or https://)"
+    if (formData.loginlink && !formData.loginlink) {
+      newErrors.loginlink = "Login link must include a # character"
     }
 
     // App store link validation - should be a valid URL

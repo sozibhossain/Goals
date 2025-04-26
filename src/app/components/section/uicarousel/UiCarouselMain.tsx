@@ -22,7 +22,7 @@ export default function UiCarouselMain({ achiveData }: { achiveData: AchiveData 
                                     alt='logo'
                                     width={200}
                                     height={220}
-                                    className='w-[150px] h-[180px] lg:w-[200px] lg:h-[220px]'
+                                    className='w-[150px] h-[180px] lg:w-[150px] lg:h-[180px]'
                                 />
                             </div>
                             <div className="">
