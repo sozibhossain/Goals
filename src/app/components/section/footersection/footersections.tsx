@@ -5,6 +5,8 @@ import { FooterData } from "@/types/home"
 
 export default function FooterSections({ footerData }: { footerData: FooterData }) {
 
+  console.log(footerData, "footerData")
+
   return (
     <footer
       className="relative rounded-[20px] mt-[-20px]"
@@ -55,7 +57,8 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
               {/* What we do Section */}
               <div className="col-span-12 lg:col-span-3">
                 <h3 className="flex justify-center mb-2 lg:mb-8 text-xl font-normal">What we do</h3>
-                <div className="bg-white p-6 rounded-md h-full">
+                <div className=" p-6 rounded-md h-full"
+                  style={{ backgroundColor: footerData?.first_text_color }}>
                   <div dangerouslySetInnerHTML={{ __html: footerData?.first_text }} />
                 </div>
               </div>
@@ -63,7 +66,9 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
               {/* Who we are Section */}
               <div className="col-span-12 lg:col-span-3">
                 <h3 className="flex justify-center mb-2 lg:mb-8 text-xl font-normal">Who we are</h3>
-                <div className="bg-white p-6 rounded-md h-full">
+                <div className=" p-6 rounded-md h-full"
+                  style={{ backgroundColor: footerData?.second_text_color }}>
+
                   <div dangerouslySetInnerHTML={{ __html: footerData?.second_text }} />
                 </div>
               </div>
@@ -71,7 +76,9 @@ export default function FooterSections({ footerData }: { footerData: FooterData 
               {/* Why use Goals Section */}
               <div className="col-span-12 lg:col-span-3">
                 <h3 className="flex justify-center mb-2 lg:mb-8 text-xl font-normal">Why use Goals</h3>
-                <div className="bg-white p-6 rounded-md h-full">
+                <div className=" p-6 rounded-md h-full"
+                  style={{ backgroundColor: footerData?.third_text_color }}
+                >
                   <div dangerouslySetInnerHTML={{ __html: footerData?.third_text }} />
                 </div>
               </div>
