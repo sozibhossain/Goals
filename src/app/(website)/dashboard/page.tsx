@@ -197,12 +197,12 @@ export default function Page() {
       formPayload.append("app_store_link", formData.appstorelink);
       formPayload.append("google_play_link", formData.googoleplaylink);
       if (formData.image) {
-        formPayload.append("image", formData.image);
+        formPayload.append("img", formData.image);
       }
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/header`, {
-          method: editingId ? "POST" : "PUT",
+          method: editingId ? "POST" : "POST", // 🔒 Force POST only
           headers: {
             Authorization: `Bearer ${token}`,
           },
