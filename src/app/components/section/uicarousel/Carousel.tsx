@@ -47,9 +47,9 @@ export default function ClientCarousel({ achiveData }: { achiveData: AchiveData 
             <Image
               src={slide.image}
               alt={slide.alt}
-              width={300}
-              height={400}
-              className="slide-image w-[150px] h-[350px] lg:w-[250px] lg:h-[500px]"
+              width={500}
+              height={300}
+              className="slide-image w-[150px] h-[350px] lg:w-[230px] lg:h-[550px]"
             />
           </SwiperSlide>
         ))}
