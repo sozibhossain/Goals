@@ -40,7 +40,7 @@ export function ContactForm() {
       }
 
       // Show success alert
-      alert("Your message has been sent successfully!")
+      alert("Thank you for reaching out! We appreciate your message and will get back to you shortly.")
 
       // Reset form
       setFormData({
