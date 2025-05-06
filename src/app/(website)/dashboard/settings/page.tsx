@@ -36,7 +36,7 @@ function Page() {
   useEffect(() => {
     const fetchCurrentEmail = async () => {
       try {
-        const response = await fetch('https://sozib.scaleupdevagency.com/api/updateEp', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/updateEp`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -76,7 +76,7 @@ function Page() {
     setMessage('');
 
     try {
-      const response = await fetch('https://sozib.scaleupdevagency.com/api/updateEp', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/updateEp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
