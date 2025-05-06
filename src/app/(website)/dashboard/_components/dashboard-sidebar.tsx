@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { LogOut, Menu } from "lucide-react"
+import { LogOut, Menu, Settings } from "lucide-react"
 import LogoutModal from "@/app/components/shared/logoutModal"
 import DashboardSidebarItem from "./dashboard-sidebar-item"
 import {
@@ -85,6 +85,7 @@ const DashboardSidebar = () => {
           </div>
         </SidebarContent>
         <SidebarFooter className="px-4 pb-6">
+          <Link href="/dashboard/settings" className="pl-4 flex items-center justify-start gap-2 text-lg font-medium text-black leading-[120%]"><Settings className="w-4 h-4"/>Settings</Link>
           <Button
             onClick={() => setIsOpen(true)}
             variant="ghost"
